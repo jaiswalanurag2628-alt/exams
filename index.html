@@ -1,0 +1,3402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SchoolMitra ERP — 360° End-to-End Examination Performance Report</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom scrollbar & clean SaaS print styling */
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    /* Hide scrollbars cleanly where appropriate */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Print optimization for A4 Executive Report */
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        font-size: 11px;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+      }
+      .shadow-sm, .shadow-md, .shadow-xl {
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+      }
+      .tab-panel {
+        display: block !important;
+        page-break-inside: avoid;
+        margin-bottom: 24px;
+      }
+      canvas {
+        max-height: 220px !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-brand-100 selection:text-brand-800">
+
+  <!-- Toast Notification Banner -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300 translate-y-4 opacity-0 no-print">
+    <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 text-sm font-medium border border-slate-700">
+      <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+      <span id="toast-message">Action completed successfully</span>
+    </div>
+  </div>
+
+  <!-- Top Executive Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 no-print">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <!-- Brand & Institution Title -->
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-600 to-indigo-800 flex items-center justify-center text-white shadow-sm">
+          <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">SchoolMitra ERP</h1>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-brand-50 text-brand-700 border border-brand-200">
+              360° Exam Intelligence
+            </span>
+          </div>
+          <p class="text-xs text-slate-500">Mirza Anwar Baig Inter College / Delhi Public Academy • Controller of Examinations</p>
+        </div>
+      </div>
+
+      <!-- Right Action Toolbar -->
+      <div class="flex items-center gap-2.5">
+        <button onclick="exportCurrentViewCSV()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition shadow-sm">
+          <i data-lucide="download" class="w-4 h-4 text-slate-500"></i>
+          <span>Export CSV</span>
+        </button>
+        <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 transition shadow-sm">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Print / A4 Report</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Print-only Report Banner -->
+  <div class="hidden print-only border-b-2 border-slate-800 pb-3 mb-4 px-6 pt-4">
+    <div class="flex justify-between items-end">
+      <div>
+        <h1 class="text-xl font-bold text-slate-900">MIRZA ANWAR BAIG INTER COLLEGE — EXAMINATION ANALYTICS REPORT</h1>
+        <p class="text-xs text-slate-600" id="print-subtitle">360° End-to-End Academic Performance Summary • Generated via SchoolMitra ERP</p>
+      </div>
+      <div class="text-right text-xs text-slate-500">
+        <p>Confidential • Academic Board Copy</p>
+        <p id="print-date"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Global Control & Filter Bar -->
+    <section class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-4 sm:p-5 no-print">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-100">
+        <div>
+          <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-brand-600"></i>
+            Global Examination Scope & Filters
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">Filter entire 360° analytical engine dynamically by session, exam cycle, grade, section, or stream</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="active-cohort-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Showing 48 Students
+          </span>
+          <button onclick="resetGlobalFilters()" class="text-xs font-semibold text-brand-600 hover:text-brand-800 px-2.5 py-1 rounded-lg hover:bg-brand-50 transition">
+            Reset All
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+        <!-- Academic Session -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Academic Session</label>
+          <select id="filter-session" onchange="handleGlobalFilterChange()" class="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition">
+            <option value="2026-27" selected>2026–27 (Current)</option>
+            <option value="2025-26">2025–26 (Prev Year)</option>
+            <option value="2024-25">2024–25 (Archived)</option>
+            <option value="2023-24">2023–24 (Baseline)</option>
+          </select>
+        </div>
+
+        <!-- Exam Term -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Examination Cycle</label>
+          <select id="filter-exam" onchange="handleGlobalFilterChange()" class="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition">
+            <option value="PREBOARD" selected>Annual / Pre-Board (Max 500)</option>
+            <option value="HALFYEARLY">Half-Yearly Exam (Max 500)</option>
+            <option value="TERM1">Term-1 Periodic Assessment (Max 500)</option>
+          </select>
+        </div>
+
+        <!-- Class -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Class / Grade</label>
+          <select id="filter-class" onchange="handleGlobalFilterChange()" class="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition">
+            <option value="ALL">All Classes (9th & 10th)</option>
+            <option value="10" selected>Class 10th (Board Batch)</option>
+            <option value="9">Class 9th (Foundation)</option>
+          </select>
+        </div>
+
+        <!-- Section -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Section</label>
+          <select id="filter-section" onchange="handleGlobalFilterChange()" class="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition">
+            <option value="ALL" selected>All Sections (A, B, C)</option>
+            <option value="A">Section A (Scholars)</option>
+            <option value="B">Section B (Achievers)</option>
+            <option value="C">Section C (Pioneers)</option>
+          </select>
+        </div>
+
+        <!-- Elective / Stream -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">5th Subject / Stream</label>
+          <select id="filter-stream" onchange="handleGlobalFilterChange()" class="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition">
+            <option value="ALL" selected>All Streams (Hindi & IT)</option>
+            <option value="Hindi">Hindi Course-A Elective</option>
+            <option value="IT">Information Tech (402)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 Executive KPI Summary Cards -->
+    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4" id="kpi-cards-container">
+      <!-- Populated dynamically via JS -->
+    </section>
+
+    <!-- 8-Tab Analytical Navigation Bar -->
+    <nav class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-1.5 no-print">
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar" id="nav-tabs">
+        <button data-tab="tab-class-ranker" onclick="switchTab('tab-class-ranker')" class="tab-btn active flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition bg-brand-600 text-white shadow-sm">
+          <i data-lucide="trophy" class="w-4 h-4"></i>
+          <span>1. Class-Wise Ranker</span>
+        </button>
+        <button data-tab="tab-percentage" onclick="switchTab('tab-percentage')" class="tab-btn flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
+          <i data-lucide="percent" class="w-4 h-4"></i>
+          <span>2. Percentage-Wise</span>
+        </button>
+        <button data-tab="tab-division" onclick="switchTab('tab-division')" class="tab-btn flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          <span>3. Division & Position</span>
+        </button>
+        <button data-tab="tab-subject" onclick="switchTab('tab-subject')" class="tab-btn flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
+          <i data-lucide="book-open-check" class="w-4 h-4"></i>
+          <span>4. Subject-Wise Ranker</span>
+        </button>
+        <button data-tab="tab-student360" onclick="switchTab('tab-student360')" class="tab-btn flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
+          <i data-lucide="user-check" class="w-4 h-4"></i>
+          <span>5. Student-Wise 360°</span>
+        </button>
+        <button data-tab="tab-teacher" onclick="switchTab('tab-teacher')" class="tab-btn flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
+          <i data-lucide="briefcase" class="w-4 h-4"></i>
+          <span>6. Teacher Subject-Wise</span>
+        </button>
+        <button data-tab="tab-section" onclick="switchTab('tab-section')" class="tab-btn flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
+          <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+          <span>7. Section-Wise Analytics</span>
+        </button>
+        <button data-tab="tab-yoy" onclick="switchTab('tab-yoy')" class="tab-btn flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
+          <i data-lucide="trending-up" class="w-4 h-4"></i>
+          <span>8. Year-on-Year (YoY)</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 1: CLASS-WISE RANKER (CUSTOM RANGE)                               -->
+    <!-- ===================================================================== -->
+    <div id="tab-class-ranker" class="tab-panel space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-extrabold">01</span>
+              Class-Wise Merit Ranker (Custom Rank Range)
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Filter merit list by Top-N presets or specify any custom rank window (e.g., Rank 4 to Rank 15)</p>
+          </div>
+
+          <!-- Custom Range Controls -->
+          <div class="flex flex-wrap items-center gap-2.5 no-print">
+            <div class="inline-flex rounded-xl bg-slate-100 p-1">
+              <button onclick="setRankPreset(1, 3)" class="rank-preset-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">Top 3</button>
+              <button onclick="setRankPreset(1, 5)" class="rank-preset-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">Top 5</button>
+              <button onclick="setRankPreset(1, 10)" class="rank-preset-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-brand-700 shadow-sm transition">Top 10</button>
+              <button onclick="setRankPreset(1, 20)" class="rank-preset-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">Top 20</button>
+              <button onclick="setRankPreset(1, 999)" class="rank-preset-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">All</button>
+            </div>
+
+            <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5">
+              <span class="text-xs font-medium text-slate-500">Rank</span>
+              <input type="number" id="rank-from" value="1" min="1" max="200" onchange="renderClassRankerTab()" class="w-12 text-center text-xs font-bold text-slate-800 bg-white border border-slate-200 rounded-lg py-1 focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <span class="text-xs text-slate-400">to</span>
+              <input type="number" id="rank-to" value="10" min="1" max="200" onchange="renderClassRankerTab()" class="w-14 text-center text-xs font-bold text-slate-800 bg-white border border-slate-200 rounded-lg py-1 focus:outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Podium Spotlight for Top 3 in Filtered Cohort -->
+        <div id="podium-cards" class="grid grid-cols-1 md:grid-cols-3 gap-4 my-5"></div>
+
+        <!-- Ranker Data Table -->
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th class="py-3 px-4">Class Rank</th>
+                <th class="py-3 px-4">Adm. No</th>
+                <th class="py-3 px-4">Student Name</th>
+                <th class="py-3 px-4">Class & Sec</th>
+                <th class="py-3 px-4 text-right">Max Marks</th>
+                <th class="py-3 px-4 text-right">Obtained</th>
+                <th class="py-3 px-4 text-right">Percentage</th>
+                <th class="py-3 px-4 text-center">Grade</th>
+                <th class="py-3 px-4">Division</th>
+                <th class="py-3 px-4 text-right no-print">360° Profile</th>
+              </tr>
+            </thead>
+            <tbody id="class-ranker-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 2: PERCENTAGE-WISE ANALYSIS (CUSTOM RANGE)                        -->
+    <!-- ===================================================================== -->
+    <div id="tab-percentage" class="tab-panel hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-extrabold">02</span>
+              Percentage-Wise Bracket & Custom Range Explorer
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Select standard academic percentage brackets or define an exact custom percentage window</p>
+          </div>
+
+          <!-- Bracket Quick Buttons + Custom Min/Max Input -->
+          <div class="flex flex-wrap items-center gap-2 no-print">
+            <button onclick="setPctRange(90, 100)" class="pct-preset px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition">90% – 100%</button>
+            <button onclick="setPctRange(75, 89.99)" class="pct-preset px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition">75% – 89.9%</button>
+            <button onclick="setPctRange(60, 74.99)" class="pct-preset px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition">60% – 74.9%</button>
+            <button onclick="setPctRange(33, 59.99)" class="pct-preset px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition">33% – 59.9%</button>
+            <button onclick="setPctRange(0, 32.99)" class="pct-preset px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition">Below 33%</button>
+            <button onclick="setPctRange(0, 100)" class="pct-preset px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition">All (0–100%)</button>
+          </div>
+        </div>
+
+        <!-- Custom Percentage Range Control Bar & Chart Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-5">
+          <!-- Left: Distribution Chart -->
+          <div class="lg:col-span-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 p-4 flex flex-col justify-between">
+            <div>
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Cohort Percentage Distribution</h4>
+              <p class="text-[11px] text-slate-500 mb-3">Student headcount & cohort share across performance bands</p>
+            </div>
+            <div class="relative h-56 w-full">
+              <canvas id="percentageChart"></canvas>
+            </div>
+            <div id="pct-bracket-pills" class="grid grid-cols-2 gap-2 mt-4 text-xs"></div>
+          </div>
+
+          <!-- Right: Custom Slider Controls & Filtered List -->
+          <div class="lg:col-span-7 flex flex-col space-y-4">
+            <div class="bg-brand-50/60 border border-brand-100 rounded-2xl p-4 no-print">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <span class="text-xs font-bold text-brand-900 uppercase tracking-wider">Custom Percentage Window</span>
+                  <p class="text-xs text-brand-700 mt-0.5" id="pct-window-summary">Showing students scoring between 75.0% and 100.0%</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1 bg-white border border-brand-200 rounded-xl px-2.5 py-1.5">
+                    <span class="text-xs text-slate-500">From</span>
+                    <input type="number" id="pct-min" value="75" min="0" max="100" step="0.5" onchange="renderPercentageTab()" class="w-14 text-center text-xs font-bold text-slate-900 focus:outline-none">
+                    <span class="text-xs font-bold text-slate-400">%</span>
+                  </div>
+                  <span class="text-xs font-semibold text-slate-400">to</span>
+                  <div class="flex items-center gap-1 bg-white border border-brand-200 rounded-xl px-2.5 py-1.5">
+                    <span class="text-xs text-slate-500">To</span>
+                    <input type="number" id="pct-max" value="100" min="0" max="100" step="0.5" onchange="renderPercentageTab()" class="w-14 text-center text-xs font-bold text-slate-900 focus:outline-none">
+                    <span class="text-xs font-bold text-slate-400">%</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Dual Range Sliders -->
+              <div class="grid grid-cols-2 gap-4 mt-3">
+                <div>
+                  <label class="text-[11px] font-medium text-slate-500">Min Threshold Slider</label>
+                  <input type="range" id="pct-min-slider" min="0" max="100" value="75" oninput="syncPctSliders('min')" class="w-full accent-brand-600 cursor-pointer">
+                </div>
+                <div>
+                  <label class="text-[11px] font-medium text-slate-500">Max Threshold Slider</label>
+                  <input type="range" id="pct-max-slider" min="0" max="100" value="100" oninput="syncPctSliders('max')" class="w-full accent-brand-600 cursor-pointer">
+                </div>
+              </div>
+            </div>
+
+            <!-- Filtered Student Table -->
+            <div class="overflow-x-auto rounded-xl border border-slate-200 flex-1 max-h-[340px]">
+              <table class="w-full text-left border-collapse">
+                <thead class="sticky top-0 bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  <tr>
+                    <th class="py-2.5 px-3.5">Student</th>
+                    <th class="py-2.5 px-3.5">Class-Sec</th>
+                    <th class="py-2.5 px-3.5 text-right">Marks</th>
+                    <th class="py-2.5 px-3.5 text-right">Percentage</th>
+                    <th class="py-2.5 px-3.5">Division</th>
+                    <th class="py-2.5 px-3.5 text-right no-print">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="percentage-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 3: DIVISION & POSITION-WISE SUMMARY                               -->
+    <!-- ===================================================================== -->
+    <div id="tab-division" class="tab-panel hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5">
+        <div class="pb-4 border-b border-slate-100">
+          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-extrabold">03</span>
+            Division & Position-Wise Standing Matrix
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">CBSE-aligned academic divisions (Distinction, 1st, 2nd, 3rd, Compartment) & Position Tier distribution across sections</p>
+        </div>
+
+        <!-- Top 5 Division Summary Cards -->
+        <div id="division-summary-cards" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 my-5"></div>
+
+        <!-- Matrix + Stacked Bar Chart -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Cross-Tab Section vs Division Matrix -->
+          <div class="lg:col-span-7 space-y-4">
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+              <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Section × Division Cross-Tab Matrix</span>
+                <span class="text-[11px] text-slate-500">Click any division card above to filter roster below</span>
+              </div>
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-slate-50/70 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase">
+                    <th class="py-2.5 px-3.5">Class & Section</th>
+                    <th class="py-2.5 px-3 text-center text-emerald-700">Distinction (≥75%)</th>
+                    <th class="py-2.5 px-3 text-center text-indigo-700">1st Div (60–74.9%)</th>
+                    <th class="py-2.5 px-3 text-center text-sky-700">2nd Div (45–59.9%)</th>
+                    <th class="py-2.5 px-3 text-center text-amber-700">3rd Div (33–44.9%)</th>
+                    <th class="py-2.5 px-3 text-center text-rose-700">Compartment (<33%)</th>
+                    <th class="py-2.5 px-3.5 text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody id="division-matrix-tbody" class="divide-y divide-slate-100"></tbody>
+              </table>
+            </div>
+
+            <!-- Position Tiers Breakdown -->
+            <div class="bg-slate-50 rounded-xl border border-slate-200 p-4">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-3">Position Tier Classification</h4>
+              <div id="position-tiers-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+            </div>
+          </div>
+
+          <!-- Stacked Division Chart -->
+          <div class="lg:col-span-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 p-4 flex flex-col">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Section-Wise Division Composition</h4>
+            <p class="text-[11px] text-slate-500 mb-3">Stacked student count per division across active sections</p>
+            <div class="relative flex-1 min-h-[250px]">
+              <canvas id="divisionChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drill-Down Student Roster by Selected Division -->
+        <div class="mt-6 pt-5 border-t border-slate-100">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h4 class="text-sm font-bold text-slate-800" id="division-drilldown-title">All Students by Division & Position</h4>
+            <select id="division-filter-select" onchange="renderDivisionTab()" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 no-print">
+              <option value="ALL">All Divisions</option>
+              <option value="Distinction">Distinction (≥75%)</option>
+              <option value="First Division">First Division (60–74.9%)</option>
+              <option value="Second Division">Second Division (45–59.9%)</option>
+              <option value="Third Division">Third Division (33–44.9%)</option>
+              <option value="Compartment">Compartment / Needs Improvement (<33%)</option>
+            </select>
+          </div>
+          <div class="overflow-x-auto rounded-xl border border-slate-200 max-h-[320px]">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead class="sticky top-0 bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase">
+                <tr>
+                  <th class="py-2.5 px-4">Position Tier</th>
+                  <th class="py-2.5 px-4">Student Name</th>
+                  <th class="py-2.5 px-4">Class-Sec</th>
+                  <th class="py-2.5 px-4 text-right">Percentage</th>
+                  <th class="py-2.5 px-4">Division</th>
+                  <th class="py-2.5 px-4">Compartment Subjects</th>
+                  <th class="py-2.5 px-4 text-right no-print">360° View</th>
+                </tr>
+              </thead>
+              <tbody id="division-roster-tbody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 4: SUBJECT-WISE RANKER & DIFFICULTY INDEX                         -->
+    <!-- ===================================================================== -->
+    <div id="tab-subject" class="tab-panel hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-extrabold">04</span>
+              Subject-Wise Ranker & Difficulty Index
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Subject toppers, mean scores, pass rates, failure count, and automated Paper Difficulty Index</p>
+          </div>
+          <div class="flex items-center gap-2 no-print">
+            <label class="text-xs font-semibold text-slate-500">Focus Subject:</label>
+            <select id="subject-focus-select" onchange="renderSubjectTab()" class="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="Mathematics">Mathematics (041)</option>
+              <option value="Science">Science (086)</option>
+              <option value="English">English Lang & Lit (184)</option>
+              <option value="Social Science">Social Science (087)</option>
+              <option value="Hindi">Hindi Course-A (002)</option>
+              <option value="IT">Information Technology (402)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Subject Overview KPI Cards Grid -->
+        <div id="subject-overview-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-5"></div>
+
+        <!-- Focused Subject Toppers Leaderboard & Score Distribution -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
+          <div class="lg:col-span-7 overflow-x-auto rounded-xl border border-slate-200">
+            <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-800" id="subject-leaderboard-title">Top 10 Rankers — Mathematics</span>
+              <span class="text-[11px] font-semibold text-brand-600" id="subject-teacher-badge">Faculty: Dr. R.K. Verma</span>
+            </div>
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50/60 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase">
+                  <th class="py-2.5 px-4">Sub. Rank</th>
+                  <th class="py-2.5 px-4">Student Name</th>
+                  <th class="py-2.5 px-4">Class-Sec</th>
+                  <th class="py-2.5 px-4 text-right">Marks (/100)</th>
+                  <th class="py-2.5 px-4 text-right">vs Sub Avg</th>
+                  <th class="py-2.5 px-4 text-center">Grade</th>
+                </tr>
+              </thead>
+              <tbody id="subject-ranker-tbody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+
+          <div class="lg:col-span-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 p-4 flex flex-col">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Subject Mean & Pass % Benchmark</h4>
+            <p class="text-[11px] text-slate-500 mb-3">Comparative average score & pass percentage across all subjects</p>
+            <div class="relative flex-1 min-h-[260px]">
+              <canvas id="subjectChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 5: STUDENT-WISE 360° RANKER & LONGITUDINAL GROWTH                 -->
+    <!-- ===================================================================== -->
+    <div id="tab-student360" class="tab-panel hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center text-xs font-extrabold">05</span>
+              Student-Wise 360° Master Ledger & Multi-Year Growth Tracker
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Complete student scorecard with Class/Section Ranks, Current Subject Marks, 4-Year Historical Percentages (2023–27), YoY Δ, and expandable year-by-year subject breakdown</p>
+          </div>
+
+          <!-- Search & Sort Controls -->
+          <div class="flex flex-wrap items-center gap-2.5 no-print">
+            <div class="relative">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="student-search-input" oninput="renderStudent360Tab()" placeholder="Search name or Adm No..." class="pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white w-52">
+            </div>
+            <select id="student-sort-select" onchange="renderStudent360Tab()" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700">
+              <option value="rank">Sort: Overall Rank</option>
+              <option value="yoy4">Sort: Highest 4-Yr Net Growth Δ</option>
+              <option value="yoy1">Sort: Highest YoY Δ (vs 25–26)</option>
+              <option value="growth">Sort: Highest Term Δ</option>
+              <option value="attendance">Sort: Attendance %</option>
+              <option value="name">Sort: Name (A–Z)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-200 mt-5">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th class="py-3 px-3">Rank</th>
+                <th class="py-3 px-3">Student & Adm No</th>
+                <th class="py-3 px-3">Current Subject Marks</th>
+                <th class="py-3 px-2.5 text-center">2023–24<br><span class="text-[9px] font-normal text-slate-400">3-Yr Ago</span></th>
+                <th class="py-3 px-2.5 text-center">2024–25<br><span class="text-[9px] font-normal text-slate-400">2-Yr Ago</span></th>
+                <th class="py-3 px-2.5 text-center">2025–26<br><span class="text-[9px] font-normal text-slate-400">Prev Yr</span></th>
+                <th class="py-3 px-2.5 text-right bg-brand-50/50 text-brand-800">2026–27<br><span class="text-[9px] font-normal text-brand-600">Current</span></th>
+                <th class="py-3 px-2.5 text-center">YoY Δ<br><span class="text-[9px] font-normal text-slate-400">vs 25–26</span></th>
+                <th class="py-3 px-2.5 text-center">4-Yr Net Δ</th>
+                <th class="py-3 px-3 text-right no-print">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="student360-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 6: TEACHER SUBJECT-WISE PERFORMANCE ACCOUNTABILITY                -->
+    <!-- ===================================================================== -->
+    <div id="tab-teacher" class="tab-panel hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5">
+        <div class="pb-4 border-b border-slate-100">
+          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center text-xs font-extrabold">06</span>
+            Teacher Subject-Wise Performance & Faculty Appraisal Index
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">Granular faculty effectiveness matrix mapping Teacher → Class & Section → Subject → Pass %, Mean Score, 90+ Distinctions & Appraisal Rating</p>
+        </div>
+
+        <!-- Chart + KPI Highlight -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-5">
+          <div class="lg:col-span-7 bg-slate-50/70 rounded-2xl border border-slate-200/80 p-4">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Faculty Subject Mean Score Comparison</h4>
+            <p class="text-[11px] text-slate-500 mb-3">Average marks delivered by each teacher across assigned sections</p>
+            <div class="relative h-64">
+              <canvas id="teacherChart"></canvas>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 flex flex-col justify-between gap-3" id="teacher-highlights"></div>
+        </div>
+
+        <!-- Teacher Accountability Table -->
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th class="py-3 px-4">Faculty Name & ID</th>
+                <th class="py-3 px-4">Subject</th>
+                <th class="py-3 px-4">Assigned Batch</th>
+                <th class="py-3 px-3 text-center">Students</th>
+                <th class="py-3 px-3 text-right">Sub. Avg</th>
+                <th class="py-3 px-3 text-right">Pass %</th>
+                <th class="py-3 px-3 text-center">Highest</th>
+                <th class="py-3 px-3 text-center">90+ Club</th>
+                <th class="py-3 px-3 text-center">Fail (<33)</th>
+                <th class="py-3 px-4 text-right">Appraisal Index</th>
+              </tr>
+            </thead>
+            <tbody id="teacher-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 7: SECTION-WISE COMPARATIVE ANALYTICS                             -->
+    <!-- ===================================================================== -->
+    <div id="tab-section" class="tab-panel hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5">
+        <div class="pb-4 border-b border-slate-100">
+          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center text-xs font-extrabold">07</span>
+            Section-Wise Comparative Analytics
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">Head-to-head benchmarking across Sections A, B, and C on Pass %, Mean, Median, Highest Score, and Section Toppers</p>
+        </div>
+
+        <!-- Section Comparison Cards -->
+        <div id="section-cards-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4 my-5"></div>
+
+        <!-- Grouped Bar Chart & Comparison Table -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 p-4">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Multi-Metric Section Benchmark</h4>
+            <p class="text-[11px] text-slate-500 mb-3">Comparing Pass %, Mean %, Median %, and Highest % per section</p>
+            <div class="relative h-64">
+              <canvas id="sectionChart"></canvas>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  <th class="py-3 px-3.5">Class & Sec</th>
+                  <th class="py-3 px-3 text-center">Strength</th>
+                  <th class="py-3 px-3 text-right">Pass %</th>
+                  <th class="py-3 px-3 text-right">Mean %</th>
+                  <th class="py-3 px-3 text-right">Median %</th>
+                  <th class="py-3 px-3 text-right">Highest %</th>
+                  <th class="py-3 px-3 text-center">Distinctions</th>
+                  <th class="py-3 px-3.5">Section Topper</th>
+                </tr>
+              </thead>
+              <tbody id="section-tbody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 8: YEAR-ON-YEAR (YoY) MULTI-SESSION COMPARISON                    -->
+    <!-- ===================================================================== -->
+    <div id="tab-yoy" class="tab-panel hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5">
+        <!-- Header & Cohort Mode Controls -->
+        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-extrabold">08</span>
+              Year-on-Year (YoY) Multi-Session Academic Comparison (2023–24 to 2026–27)
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Benchmark institution outcomes across 4 consecutive academic sessions or track the same student batch longitudinally from Class 7 → Class 10</p>
+          </div>
+
+          <!-- Interactive Session Selector & Cohort Mode Toggle -->
+          <div class="flex flex-wrap items-center gap-2.5 no-print">
+            <!-- Cohort Mode Segmented Control -->
+            <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+              <button id="yoy-mode-same" onclick="setYoYMode('SAME_CLASS')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-brand-700 shadow-sm transition">
+                Same Class Cohort Benchmark
+              </button>
+              <button id="yoy-mode-longitudinal" onclick="setYoYMode('LONGITUDINAL')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
+                Longitudinal Progression (Class 7 → 10)
+              </button>
+            </div>
+
+            <!-- Baseline Comparison Session Dropdown -->
+            <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
+              <span class="text-[11px] font-semibold text-slate-500">Compare 2026–27 vs:</span>
+              <select id="yoy-baseline-select" onchange="renderYoYTab()" class="text-xs font-bold text-brand-700 bg-transparent focus:outline-none cursor-pointer">
+                <option value="2025-26" selected>2025–26 (Prior Year)</option>
+                <option value="2024-25">2024–25 (2 Yrs Ago)</option>
+                <option value="2023-24">2023–24 (4-Yr Baseline)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cohort Mode Context Banner -->
+        <div id="yoy-mode-banner" class="mt-4 rounded-xl bg-brand-50/70 border border-brand-100 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="flex items-center gap-2 text-brand-900 font-medium">
+            <i data-lucide="info" class="w-4 h-4 text-brand-600 shrink-0"></i>
+            <span id="yoy-mode-description">Benchmarking consecutive Class cohorts across 2023–24, 2024–25, 2025–26, and 2026–27 for identical exam standards.</span>
+          </div>
+          <span id="yoy-cohort-tag" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white text-brand-700 border border-brand-200">
+            Mode: Same-Grade Institutional Benchmark
+          </span>
+        </div>
+
+        <!-- 1. Multi-Year YoY Delta KPI Cards -->
+        <div id="yoy-kpi-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-5"></div>
+
+        <!-- 2. Multi-Year Grouped Bar & Trend Line Chart + Division Shift Quality Pyramid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-5">
+          <!-- Left: Chart.js Combo Chart -->
+          <div class="lg:col-span-6 bg-slate-50/70 rounded-2xl border border-slate-200/80 p-4 flex flex-col">
+            <div class="flex items-center justify-between mb-1">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700">4-Year Session-over-Session Trajectory</h4>
+              <span class="text-[11px] font-semibold text-slate-500">Mean %, Pass % & Distinction %</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mb-3">Grouped bar & trendline comparison across 2023–24 through 2026–27</p>
+            <div class="relative flex-1 min-h-[260px]">
+              <canvas id="yoyTrendChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Right: Division Shift & Quality Pyramid Table -->
+          <div class="lg:col-span-6 overflow-x-auto rounded-2xl border border-slate-200 flex flex-col justify-between bg-white">
+            <div>
+              <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+                <div>
+                  <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800">Division Shift & Quality Pyramid (4-Year)</h4>
+                  <p class="text-[11px] text-slate-500">Cohort share movement from Compartment/3rd Div upward into Distinction</p>
+                </div>
+              </div>
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50/70 border-b border-slate-200 font-bold text-slate-500 uppercase">
+                    <th class="py-2.5 px-3.5">Academic Division</th>
+                    <th class="py-2.5 px-2.5 text-center">2023–24</th>
+                    <th class="py-2.5 px-2.5 text-center">2024–25</th>
+                    <th class="py-2.5 px-2.5 text-center">2025–26</th>
+                    <th class="py-2.5 px-2.5 text-center bg-brand-50/50 text-brand-800">2026–27</th>
+                    <th class="py-2.5 px-3 text-right">YoY Shift</th>
+                  </tr>
+                </thead>
+                <tbody id="yoy-division-tbody" class="divide-y divide-slate-100"></tbody>
+              </table>
+            </div>
+            <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
+              <span>Quality Upgrade Index:</span>
+              <span id="yoy-quality-summary" class="font-bold text-emerald-700">+12.5% upward shift into First Division & Distinction</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Subject-Wise 4-Year Trend Matrix -->
+        <div class="mt-6 pt-5 border-t border-slate-100">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div>
+              <h4 class="text-sm font-bold text-slate-900">Subject-Wise 4-Year Performance Trend Matrix</h4>
+              <p class="text-xs text-slate-500">Subject mean score and pass percentage progression across 2023–24, 2024–25, 2025–26, and 2026–27 with YoY variance badges</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-500 uppercase tracking-wider">
+                  <th class="py-3 px-4">Subject Name</th>
+                  <th class="py-3 px-3 text-center">2023–24<br><span class="text-[10px] font-normal text-slate-400">Mean | Pass%</span></th>
+                  <th class="py-3 px-3 text-center">2024–25<br><span class="text-[10px] font-normal text-slate-400">Mean | Pass%</span></th>
+                  <th class="py-3 px-3 text-center">2025–26<br><span class="text-[10px] font-normal text-slate-400">Mean | Pass%</span></th>
+                  <th class="py-3 px-3 text-center bg-brand-50/60 text-brand-800">2026–27 (Curr)<br><span class="text-[10px] font-normal text-brand-600">Mean | Pass%</span></th>
+                  <th class="py-3 px-3 text-right">YoY Mean Δ</th>
+                  <th class="py-3 px-4 text-right">4-Yr Net Gain</th>
+                </tr>
+              </thead>
+              <tbody id="yoy-subject-tbody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 4. Teacher Year-on-Year Effectiveness Comparison -->
+        <div class="mt-6 pt-5 border-t border-slate-100">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div>
+              <h4 class="text-sm font-bold text-slate-900">Teacher Year-on-Year Effectiveness & Consistency Ledger</h4>
+              <p class="text-xs text-slate-500">Faculty subject average scores and pass percentages across consecutive academic sessions</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-500 uppercase tracking-wider">
+                  <th class="py-3 px-4">Faculty Name & ID</th>
+                  <th class="py-3 px-3">Subject & Grade</th>
+                  <th class="py-3 px-3 text-right">2023–24 Avg</th>
+                  <th class="py-3 px-3 text-right">2024–25 Avg</th>
+                  <th class="py-3 px-3 text-right">2025–26 Avg</th>
+                  <th class="py-3 px-3 text-right bg-brand-50/60 text-brand-800">2026–27 Avg</th>
+                  <th class="py-3 px-3 text-center">2026–27 Pass%</th>
+                  <th class="py-3 px-4 text-right">YoY Faculty Δ</th>
+                </tr>
+              </thead>
+              <tbody id="yoy-teacher-tbody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 5. STUDENT YEAR-BY-YEAR DEEP-DIVE COMPARATOR & 4-YEAR SUBJECT MATRIX -->
+        <div id="yoy-student-deepdive-section" class="mt-8 pt-6 border-t-2 border-slate-200 space-y-5">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-brand-900 text-white rounded-2xl p-5 shadow-sm">
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/15 text-indigo-200 border border-white/20 mb-1.5">
+                <i data-lucide="git-compare" class="w-3.5 h-3.5"></i>
+                Individual Student Multi-Year Analytics
+              </div>
+              <h4 class="text-base sm:text-lg font-bold tracking-tight">Student Year-by-Year Longitudinal Comparison (2023–24 to 2026–27)</h4>
+              <p class="text-xs text-indigo-200 mt-0.5">Select any student—and optionally a peer benchmark student—to inspect 4 consecutive years of subject marks, ranks, attendance, and growth deltas directly on this page</p>
+            </div>
+
+            <!-- Student A & Peer Student B Selectors -->
+            <div class="flex flex-wrap items-center gap-3 no-print">
+              <div class="bg-white/10 border border-white/20 rounded-xl px-3 py-2">
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-indigo-200 mb-0.5">Primary Student</label>
+                <select id="yoy-student-primary" onchange="renderStudentYoYDeepDive()" class="bg-transparent text-xs sm:text-sm font-bold text-white focus:outline-none cursor-pointer pr-2">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+              <div class="bg-white/10 border border-white/20 rounded-xl px-3 py-2">
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-amber-200 mb-0.5">Compare With (Optional)</label>
+                <select id="yoy-student-compare" onchange="renderStudentYoYDeepDive()" class="bg-transparent text-xs sm:text-sm font-bold text-white focus:outline-none cursor-pointer pr-2">
+                  <option value="NONE" class="text-slate-900">— None (Single Student View) —</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Primary Student 4-Year Milestone Cards -->
+          <div id="yoy-student-milestones" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5"></div>
+
+          <!-- Chart + 4-Year Subject-by-Subject Matrix Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left 5 Cols: 4-Year Percentage & Rank Trajectory Chart -->
+            <div class="lg:col-span-5 bg-slate-50/80 rounded-2xl border border-slate-200 p-4 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <h5 class="text-xs font-bold uppercase tracking-wider text-slate-700">4-Year Percentage & Rank Trajectory</h5>
+                  <span id="yoy-student-badge-pill" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Consistent Topper</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mb-3" id="yoy-student-chart-sub">Progression from 2023–24 through 2026–27 across promotions</p>
+              </div>
+              <div class="relative h-64 w-full">
+                <canvas id="studentYoYTrajectoryChart"></canvas>
+              </div>
+              <div id="yoy-student-insight-box" class="mt-3 bg-white rounded-xl border border-slate-200 p-3 text-xs text-slate-700"></div>
+            </div>
+
+            <!-- Right 7 Cols: 4-Year Subject-by-Subject Matrix Table -->
+            <div class="lg:col-span-7 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+              <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h5 class="text-xs font-bold uppercase tracking-wider text-slate-800" id="yoy-matrix-student-title">4-Year Subject-by-Subject Scorecard Matrix</h5>
+                  <p class="text-[11px] text-slate-500">Year-over-year subject marks, consecutive deltas, and 4-year net improvement</p>
+                </div>
+              </div>
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50/80 border-b border-slate-200 font-bold text-slate-500 uppercase">
+                    <th class="py-2.5 px-3.5">Subject / Metric</th>
+                    <th class="py-2.5 px-2.5 text-center" id="yoy-col-yr0">2023–24</th>
+                    <th class="py-2.5 px-2.5 text-center" id="yoy-col-yr1">2024–25</th>
+                    <th class="py-2.5 px-2.5 text-center" id="yoy-col-yr2">2025–26</th>
+                    <th class="py-2.5 px-2.5 text-center bg-brand-50/60 text-brand-800" id="yoy-col-yr3">2026–27</th>
+                    <th class="py-2.5 px-2.5 text-center">YoY Δ<br><span class="text-[9px] font-normal text-slate-400">25→26</span></th>
+                    <th class="py-2.5 px-3.5 text-right">4-Yr Net</th>
+                  </tr>
+                </thead>
+                <tbody id="yoy-student-matrix-tbody" class="divide-y divide-slate-100"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 6. MASTER ALL-STUDENTS YEAR-BY-YEAR GROWTH LEDGER (INLINE EXPANDABLE) -->
+          <div class="pt-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+              <div>
+                <h4 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <span>All Students — Complete 4-Year Longitudinal Growth Ledger</span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-50 text-brand-700 border border-brand-200">Click any row to expand 4-Yr Subject Marks</span>
+                </h4>
+                <p class="text-xs text-slate-500">Side-by-side comparison of every student's previous years' percentages, ranks, divisions, and net 4-year growth trajectory on a single page</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 no-print">
+                <div class="relative">
+                  <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                  <input type="text" id="yoy-ledger-search" oninput="renderMasterYoYStudentLedger()" placeholder="Filter student..." class="pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 w-44">
+                </div>
+                <select id="yoy-ledger-trajectory-filter" onchange="renderMasterYoYStudentLedger()" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700">
+                  <option value="ALL">All Trajectories</option>
+                  <option value="Consistent Topper">Consistent Topper</option>
+                  <option value="Rising Star">Rising Star (+7% & above)</option>
+                  <option value="Steady Climber">Steady Climber</option>
+                  <option value="Needs Attention">Needs Attention</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-500 uppercase tracking-wider">
+                    <th class="py-3 px-3 w-8"></th>
+                    <th class="py-3 px-3">Student & Adm No</th>
+                    <th class="py-3 px-3 text-center">2023–24<br><span class="text-[9px] font-normal text-slate-400">% | Rank</span></th>
+                    <th class="py-3 px-3 text-center">2024–25<br><span class="text-[9px] font-normal text-slate-400">% | Rank</span></th>
+                    <th class="py-3 px-3 text-center">2025–26<br><span class="text-[9px] font-normal text-slate-400">% | Rank</span></th>
+                    <th class="py-3 px-3 text-center bg-brand-50/50 text-brand-800">2026–27 (Curr)<br><span class="text-[9px] font-normal text-brand-600">% | Rank</span></th>
+                    <th class="py-3 px-3 text-center">4-Yr Trend</th>
+                    <th class="py-3 px-3 text-right">YoY Δ (25→26)</th>
+                    <th class="py-3 px-3 text-right">4-Yr Net Δ</th>
+                    <th class="py-3 px-3">Trajectory Badge</th>
+                    <th class="py-3 px-3 text-right no-print">Compare</th>
+                  </tr>
+                </thead>
+                <tbody id="yoy-master-students-tbody" class="divide-y divide-slate-100"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ======================================================================= -->
+  <!-- STUDENT 360° REPORT CARD MODAL                                          -->
+  <!-- ======================================================================= -->
+  <div id="student-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-4xl w-full max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-brand-900 text-white px-6 py-5 flex items-start justify-between">
+        <div class="flex items-center gap-4">
+          <div id="modal-avatar" class="w-14 h-14 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center text-xl font-extrabold tracking-tight">
+            AR
+          </div>
+          <div>
+            <div class="flex items-center gap-2.5">
+              <h3 id="modal-student-name" class="text-lg font-bold">Aarav Sharma</h3>
+              <span id="modal-division-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30">Distinction</span>
+            </div>
+            <p id="modal-student-meta" class="text-xs text-indigo-200 mt-1">Adm No: DPA-2026-1001 • Class 10-A • Roll No: 01 • Attendance: 96%</p>
+          </div>
+        </div>
+        <button onclick="closeStudentModal()" class="p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 space-y-5">
+        <!-- Quick Rank & Score Strip -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="modal-kpi-strip"></div>
+
+        <!-- Radar Comparison + Multi-Year Academic Progression Chart -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
+          <div class="md:col-span-6 bg-slate-50 rounded-2xl border border-slate-200 p-3.5 flex flex-col">
+            <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1 text-center">Subject Radar: Student vs Cohort Avg</h4>
+            <div class="relative h-52 flex-1">
+              <canvas id="modalRadarChart"></canvas>
+            </div>
+          </div>
+
+          <div class="md:col-span-6 bg-slate-50 rounded-2xl border border-slate-200 p-3.5 flex flex-col">
+            <div class="flex items-center justify-between mb-1">
+              <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-600">4-Year Academic Progression (2023–27)</h4>
+              <span id="modal-yoy-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">+6.4% 4-Yr</span>
+            </div>
+            <div class="relative h-52 flex-1">
+              <canvas id="modalYoYChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subject Breakdown Table -->
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-500 uppercase">
+                <th class="py-2.5 px-3">Subject</th>
+                <th class="py-2.5 px-3">Faculty</th>
+                <th class="py-2.5 px-3 text-right">Marks</th>
+                <th class="py-2.5 px-3 text-right">Class Avg</th>
+                <th class="py-2.5 px-3 text-center">Grade</th>
+              </tr>
+            </thead>
+            <tbody id="modal-subjects-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+
+        <!-- Longitudinal Term Progression & Counselor Remark -->
+        <div class="bg-brand-50/60 border border-brand-100 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-brand-800">360° Academic Advisory & Term Progression</span>
+            <p id="modal-remark" class="text-xs text-slate-700 mt-1"></p>
+          </div>
+          <div id="modal-term-pills" class="flex items-center gap-2 shrink-0"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-400 no-print">
+    SchoolMitra ERP • 360-Degree End-to-End Examination Analytics Engine • All calculations computed dynamically in real time.
+  </footer>
+
+  <!-- ======================================================================= -->
+  <!-- JAVASCRIPT DATA ENGINE & INTERACTIVE ANALYTICS LOGIC                    -->
+  <!-- ======================================================================= -->
+  <script>
+    // -------------------------------------------------------------------------
+    // 1. REALISTIC INDIAN SCHOOL DATASET (48 Students across Class 9 & 10, Sec A, B, C)
+    // -------------------------------------------------------------------------
+    const TEACHER_DIRECTORY = [
+      { id: 'FAC-101', name: 'Dr. R.K. Verma', subject: 'Mathematics', classNum: '10', sections: ['A', 'B', 'C'] },
+      { id: 'FAC-102', name: 'Mrs. Sunita Nair', subject: 'Science', classNum: '10', sections: ['A', 'B', 'C'] },
+      { id: 'FAC-103', name: 'Ms. Anjali Deshmukh', subject: 'English', classNum: '10', sections: ['A', 'B', 'C'] },
+      { id: 'FAC-104', name: 'Mr. Harish Chandra', subject: 'Social Science', classNum: '10', sections: ['A', 'B', 'C'] },
+      { id: 'FAC-105', name: 'Mrs. Kavita Joshi', subject: 'Hindi', classNum: '10', sections: ['A', 'B', 'C'] },
+      { id: 'FAC-106', name: 'Mr. Vikramaditya Rao', subject: 'IT', classNum: '10', sections: ['A', 'B', 'C'] },
+
+      { id: 'FAC-201', name: 'Mr. Sandeep Kulkarni', subject: 'Mathematics', classNum: '9', sections: ['A', 'B', 'C'] },
+      { id: 'FAC-202', name: 'Dr. Meenakshi Iyer', subject: 'Science', classNum: '9', sections: ['A', 'B', 'C'] },
+      { id: 'FAC-203', name: 'Mrs. Pooja Malhotra', subject: 'English', classNum: '9', sections: ['A', 'B', 'C'] },
+      { id: 'FAC-204', name: 'Mr. Rajeshwar Tiwari', subject: 'Social Science', classNum: '9', sections: ['A', 'B', 'C'] },
+      { id: 'FAC-205', name: 'Mr. Dinesh Pandey', subject: 'Hindi', classNum: '9', sections: ['A', 'B', 'C'] },
+      { id: 'FAC-206', name: 'Ms. Neha Saxena', subject: 'IT', classNum: '9', sections: ['A', 'B', 'C'] },
+    ];
+
+    const RAW_STUDENTS = [
+      // ================= CLASS 10 - SECTION A (8 Students) =================
+      { admNo: 'DPA-1001', roll: 1, name: 'Aarav Sharma', classNum: '10', section: 'A', elective: 'IT', attendance: 97,
+        marks: {
+          TERM1: { Mathematics: 94, Science: 92, English: 89, 'Social Science': 91, IT: 96 },
+          HALFYEARLY: { Mathematics: 96, Science: 94, English: 91, 'Social Science': 93, IT: 97 },
+          PREBOARD: { Mathematics: 98, Science: 96, English: 93, 'Social Science': 95, IT: 99 }
+        }
+      },
+      { admNo: 'DPA-1002', roll: 2, name: 'Ananya Iyer', classNum: '10', section: 'A', elective: 'IT', attendance: 96,
+        marks: {
+          TERM1: { Mathematics: 91, Science: 93, English: 94, 'Social Science': 90, IT: 95 },
+          HALFYEARLY: { Mathematics: 93, Science: 94, English: 95, 'Social Science': 92, IT: 96 },
+          PREBOARD: { Mathematics: 95, Science: 96, English: 96, 'Social Science': 94, IT: 98 }
+        }
+      },
+      { admNo: 'DPA-1003', roll: 3, name: 'Vihaan Nair', classNum: '10', section: 'A', elective: 'Hindi', attendance: 94,
+        marks: {
+          TERM1: { Mathematics: 88, Science: 86, English: 85, 'Social Science': 89, Hindi: 87 },
+          HALFYEARLY: { Mathematics: 90, Science: 89, English: 87, 'Social Science': 91, Hindi: 89 },
+          PREBOARD: { Mathematics: 92, Science: 91, English: 88, 'Social Science': 93, Hindi: 90 }
+        }
+      },
+      { admNo: 'DPA-1004', roll: 4, name: 'Diya Kulkarni', classNum: '10', section: 'A', elective: 'IT', attendance: 92,
+        marks: {
+          TERM1: { Mathematics: 82, Science: 84, English: 88, 'Social Science': 85, IT: 90 },
+          HALFYEARLY: { Mathematics: 85, Science: 86, English: 89, 'Social Science': 86, IT: 92 },
+          PREBOARD: { Mathematics: 87, Science: 88, English: 91, 'Social Science': 88, IT: 94 }
+        }
+      },
+      { admNo: 'DPA-1005', roll: 5, name: 'Kabir Malhotra', classNum: '10', section: 'A', elective: 'Hindi', attendance: 89,
+        marks: {
+          TERM1: { Mathematics: 78, Science: 76, English: 80, 'Social Science': 79, Hindi: 81 },
+          HALFYEARLY: { Mathematics: 75, Science: 74, English: 79, 'Social Science': 78, Hindi: 80 },
+          PREBOARD: { Mathematics: 79, Science: 77, English: 82, 'Social Science': 80, Hindi: 82 }
+        }
+      },
+      { admNo: 'DPA-1006', roll: 6, name: 'Saanvi Deshpande', classNum: '10', section: 'A', elective: 'IT', attendance: 91,
+        marks: {
+          TERM1: { Mathematics: 72, Science: 74, English: 77, 'Social Science': 75, IT: 83 },
+          HALFYEARLY: { Mathematics: 74, Science: 76, English: 79, 'Social Science': 76, IT: 85 },
+          PREBOARD: { Mathematics: 76, Science: 78, English: 81, 'Social Science': 79, IT: 86 }
+        }
+      },
+      { admNo: 'DPA-1007', roll: 7, name: 'Reyansh Joshi', classNum: '10', section: 'A', elective: 'Hindi', attendance: 85,
+        marks: {
+          TERM1: { Mathematics: 64, Science: 66, English: 70, 'Social Science': 68, Hindi: 72 },
+          HALFYEARLY: { Mathematics: 67, Science: 68, English: 71, 'Social Science': 70, Hindi: 74 },
+          PREBOARD: { Mathematics: 69, Science: 71, English: 73, 'Social Science': 72, Hindi: 75 }
+        }
+      },
+      { admNo: 'DPA-1008', roll: 8, name: 'Myra Bansal', classNum: '10', section: 'A', elective: 'IT', attendance: 88,
+        marks: {
+          TERM1: { Mathematics: 58, Science: 61, English: 67, 'Social Science': 64, IT: 72 },
+          HALFYEARLY: { Mathematics: 61, Science: 63, English: 69, 'Social Science': 66, IT: 74 },
+          PREBOARD: { Mathematics: 63, Science: 65, English: 71, 'Social Science': 68, IT: 76 }
+        }
+      },
+
+      // ================= CLASS 10 - SECTION B (8 Students) =================
+      { admNo: 'DPA-1009', roll: 1, name: 'Advait Verma', classNum: '10', section: 'B', elective: 'IT', attendance: 95,
+        marks: {
+          TERM1: { Mathematics: 90, Science: 89, English: 87, 'Social Science': 88, IT: 93 },
+          HALFYEARLY: { Mathematics: 92, Science: 91, English: 89, 'Social Science': 90, IT: 95 },
+          PREBOARD: { Mathematics: 94, Science: 93, English: 90, 'Social Science': 92, IT: 96 }
+        }
+      },
+      { admNo: 'DPA-1010', roll: 2, name: 'Ishita Chatterjee', classNum: '10', section: 'B', elective: 'Hindi', attendance: 93,
+        marks: {
+          TERM1: { Mathematics: 84, Science: 85, English: 91, 'Social Science': 87, Hindi: 88 },
+          HALFYEARLY: { Mathematics: 86, Science: 87, English: 92, 'Social Science': 89, Hindi: 90 },
+          PREBOARD: { Mathematics: 89, Science: 88, English: 94, 'Social Science': 91, Hindi: 91 }
+        }
+      },
+      { admNo: 'DPA-1011', roll: 3, name: 'Arjun Reddy', classNum: '10', section: 'B', elective: 'IT', attendance: 90,
+        marks: {
+          TERM1: { Mathematics: 79, Science: 81, English: 76, 'Social Science': 78, IT: 85 },
+          HALFYEARLY: { Mathematics: 81, Science: 82, English: 78, 'Social Science': 80, IT: 87 },
+          PREBOARD: { Mathematics: 83, Science: 84, English: 80, 'Social Science': 82, IT: 89 }
+        }
+      },
+      { admNo: 'DPA-1012', roll: 4, name: 'Kavya Menon', classNum: '10', section: 'B', elective: 'Hindi', attendance: 88,
+        marks: {
+          TERM1: { Mathematics: 71, Science: 73, English: 78, 'Social Science': 74, Hindi: 79 },
+          HALFYEARLY: { Mathematics: 70, Science: 72, English: 77, 'Social Science': 73, Hindi: 78 },
+          PREBOARD: { Mathematics: 74, Science: 75, English: 80, 'Social Science': 76, Hindi: 81 }
+        }
+      },
+      { admNo: 'DPA-1013', roll: 5, name: 'Rohan Saxena', classNum: '10', section: 'B', elective: 'IT', attendance: 84,
+        marks: {
+          TERM1: { Mathematics: 62, Science: 60, English: 65, 'Social Science': 63, IT: 71 },
+          HALFYEARLY: { Mathematics: 60, Science: 59, English: 64, 'Social Science': 62, IT: 70 },
+          PREBOARD: { Mathematics: 64, Science: 62, English: 67, 'Social Science': 65, IT: 73 }
+        }
+      },
+      { admNo: 'DPA-1014', roll: 6, name: 'Prisha Agarwal', classNum: '10', section: 'B', elective: 'Hindi', attendance: 82,
+        marks: {
+          TERM1: { Mathematics: 54, Science: 56, English: 62, 'Social Science': 58, Hindi: 64 },
+          HALFYEARLY: { Mathematics: 52, Science: 55, English: 61, 'Social Science': 57, Hindi: 63 },
+          PREBOARD: { Mathematics: 56, Science: 58, English: 64, 'Social Science': 60, Hindi: 66 }
+        }
+      },
+      { admNo: 'DPA-1015', roll: 7, name: 'Devansh Tiwari', classNum: '10', section: 'B', elective: 'Hindi', attendance: 76,
+        marks: {
+          TERM1: { Mathematics: 41, Science: 44, English: 49, 'Social Science': 46, Hindi: 52 },
+          HALFYEARLY: { Mathematics: 39, Science: 42, English: 48, 'Social Science': 45, Hindi: 50 },
+          PREBOARD: { Mathematics: 43, Science: 45, English: 51, 'Social Science': 48, Hindi: 54 }
+        }
+      },
+      { admNo: 'DPA-1016', roll: 8, name: 'Nandini Gupta', classNum: '10', section: 'B', elective: 'IT', attendance: 71,
+        marks: {
+          TERM1: { Mathematics: 28, Science: 34, English: 44, 'Social Science': 39, IT: 48 },
+          HALFYEARLY: { Mathematics: 26, Science: 31, English: 42, 'Social Science': 37, IT: 46 },
+          PREBOARD: { Mathematics: 29, Science: 35, English: 45, 'Social Science': 40, IT: 50 }
+        }
+      },
+
+      // ================= CLASS 10 - SECTION C (8 Students) =================
+      { admNo: 'DPA-1017', roll: 1, name: 'Siddharth Rao', classNum: '10', section: 'C', elective: 'IT', attendance: 93,
+        marks: {
+          TERM1: { Mathematics: 86, Science: 84, English: 82, 'Social Science': 85, IT: 91 },
+          HALFYEARLY: { Mathematics: 88, Science: 86, English: 84, 'Social Science': 87, IT: 92 },
+          PREBOARD: { Mathematics: 90, Science: 88, English: 86, 'Social Science': 89, IT: 94 }
+        }
+      },
+      { admNo: 'DPA-1018', roll: 2, name: 'Anushka Chauhan', classNum: '10', section: 'C', elective: 'Hindi', attendance: 90,
+        marks: {
+          TERM1: { Mathematics: 77, Science: 79, English: 83, 'Social Science': 80, Hindi: 84 },
+          HALFYEARLY: { Mathematics: 79, Science: 80, English: 85, 'Social Science': 81, Hindi: 85 },
+          PREBOARD: { Mathematics: 81, Science: 82, English: 86, 'Social Science': 83, Hindi: 87 }
+        }
+      },
+      { admNo: 'DPA-1019', roll: 3, name: 'Yashvardhan Singh', classNum: '10', section: 'C', elective: 'Hindi', attendance: 86,
+        marks: {
+          TERM1: { Mathematics: 68, Science: 67, English: 71, 'Social Science': 70, Hindi: 73 },
+          HALFYEARLY: { Mathematics: 66, Science: 65, English: 70, 'Social Science': 69, Hindi: 72 },
+          PREBOARD: { Mathematics: 70, Science: 69, English: 73, 'Social Science': 71, Hindi: 75 }
+        }
+      },
+      { admNo: 'DPA-1020', roll: 4, name: 'Tanya Bhatt', classNum: '10', section: 'C', elective: 'IT', attendance: 84,
+        marks: {
+          TERM1: { Mathematics: 61, Science: 63, English: 68, 'Social Science': 64, IT: 72 },
+          HALFYEARLY: { Mathematics: 63, Science: 64, English: 69, 'Social Science': 65, IT: 74 },
+          PREBOARD: { Mathematics: 65, Science: 66, English: 71, 'Social Science': 67, IT: 76 }
+        }
+      },
+      { admNo: 'DPA-1021', roll: 5, name: 'Harshvardhan Mishra', classNum: '10', section: 'C', elective: 'Hindi', attendance: 79,
+        marks: {
+          TERM1: { Mathematics: 49, Science: 51, English: 55, 'Social Science': 53, Hindi: 58 },
+          HALFYEARLY: { Mathematics: 47, Science: 49, English: 54, 'Social Science': 51, Hindi: 56 },
+          PREBOARD: { Mathematics: 51, Science: 53, English: 57, 'Social Science': 55, Hindi: 60 }
+        }
+      },
+      { admNo: 'DPA-1022', roll: 6, name: 'Riya Srivastava', classNum: '10', section: 'C', elective: 'Hindi', attendance: 78,
+        marks: {
+          TERM1: { Mathematics: 44, Science: 46, English: 52, 'Social Science': 48, Hindi: 54 },
+          HALFYEARLY: { Mathematics: 45, Science: 47, English: 53, 'Social Science': 49, Hindi: 55 },
+          PREBOARD: { Mathematics: 47, Science: 49, English: 55, 'Social Science': 51, Hindi: 57 }
+        }
+      },
+      { admNo: 'DPA-1023', roll: 7, name: 'Kunal Yadav', classNum: '10', section: 'C', elective: 'IT', attendance: 69,
+        marks: {
+          TERM1: { Mathematics: 27, Science: 29, English: 41, 'Social Science': 38, IT: 45 },
+          HALFYEARLY: { Mathematics: 25, Science: 28, English: 39, 'Social Science': 36, IT: 43 },
+          PREBOARD: { Mathematics: 30, Science: 31, English: 42, 'Social Science': 39, IT: 47 }
+        }
+      },
+      { admNo: 'DPA-1024', roll: 8, name: 'Simran Kaur', classNum: '10', section: 'C', elective: 'Hindi', attendance: 74,
+        marks: {
+          TERM1: { Mathematics: 31, Science: 36, English: 46, 'Social Science': 42, Hindi: 49 },
+          HALFYEARLY: { Mathematics: 34, Science: 38, English: 48, 'Social Science': 44, Hindi: 51 },
+          PREBOARD: { Mathematics: 36, Science: 40, English: 50, 'Social Science': 45, Hindi: 53 }
+        }
+      },
+
+      // ================= CLASS 9 - SECTION A (8 Students) =================
+      { admNo: 'DPA-0901', roll: 1, name: 'Atharv Kulkarni', classNum: '9', section: 'A', elective: 'IT', attendance: 96,
+        marks: {
+          TERM1: { Mathematics: 93, Science: 91, English: 88, 'Social Science': 90, IT: 95 },
+          HALFYEARLY: { Mathematics: 95, Science: 93, English: 90, 'Social Science': 92, IT: 96 },
+          PREBOARD: { Mathematics: 97, Science: 95, English: 92, 'Social Science': 94, IT: 98 }
+        }
+      },
+      { admNo: 'DPA-0902', roll: 2, name: 'Meera Krishnan', classNum: '9', section: 'A', elective: 'IT', attendance: 95,
+        marks: {
+          TERM1: { Mathematics: 89, Science: 90, English: 93, 'Social Science': 91, IT: 94 },
+          HALFYEARLY: { Mathematics: 91, Science: 92, English: 94, 'Social Science': 93, IT: 95 },
+          PREBOARD: { Mathematics: 93, Science: 94, English: 95, 'Social Science': 94, IT: 97 }
+        }
+      },
+      { admNo: 'DPA-0903', roll: 3, name: 'Shaurya Pratap', classNum: '9', section: 'A', elective: 'Hindi', attendance: 91,
+        marks: {
+          TERM1: { Mathematics: 82, Science: 80, English: 79, 'Social Science': 83, Hindi: 85 },
+          HALFYEARLY: { Mathematics: 84, Science: 82, English: 81, 'Social Science': 84, Hindi: 86 },
+          PREBOARD: { Mathematics: 86, Science: 84, English: 83, 'Social Science': 86, Hindi: 88 }
+        }
+      },
+      { admNo: 'DPA-0904', roll: 4, name: 'Avni Singhal', classNum: '9', section: 'A', elective: 'IT', attendance: 90,
+        marks: {
+          TERM1: { Mathematics: 76, Science: 78, English: 82, 'Social Science': 79, IT: 86 },
+          HALFYEARLY: { Mathematics: 78, Science: 80, English: 84, 'Social Science': 81, IT: 88 },
+          PREBOARD: { Mathematics: 80, Science: 82, English: 85, 'Social Science': 83, IT: 90 }
+        }
+      },
+      { admNo: 'DPA-0905', roll: 5, name: 'Parth Rastogi', classNum: '9', section: 'A', elective: 'Hindi', attendance: 87,
+        marks: {
+          TERM1: { Mathematics: 69, Science: 71, English: 73, 'Social Science': 72, Hindi: 75 },
+          HALFYEARLY: { Mathematics: 71, Science: 72, English: 74, 'Social Science': 73, Hindi: 76 },
+          PREBOARD: { Mathematics: 73, Science: 74, English: 76, 'Social Science': 75, Hindi: 78 }
+        }
+      },
+      { admNo: 'DPA-0906', roll: 6, name: 'Navya Jain', classNum: '9', section: 'A', elective: 'IT', attendance: 88,
+        marks: {
+          TERM1: { Mathematics: 65, Science: 67, English: 71, 'Social Science': 68, IT: 76 },
+          HALFYEARLY: { Mathematics: 67, Science: 69, English: 72, 'Social Science': 70, IT: 78 },
+          PREBOARD: { Mathematics: 69, Science: 71, English: 74, 'Social Science': 72, IT: 80 }
+        }
+      },
+      { admNo: 'DPA-0907', roll: 7, name: 'Aryan Kapoor', classNum: '9', section: 'A', elective: 'Hindi', attendance: 83,
+        marks: {
+          TERM1: { Mathematics: 57, Science: 59, English: 63, 'Social Science': 60, Hindi: 65 },
+          HALFYEARLY: { Mathematics: 59, Science: 61, English: 64, 'Social Science': 62, Hindi: 66 },
+          PREBOARD: { Mathematics: 61, Science: 63, English: 66, 'Social Science': 64, Hindi: 68 }
+        }
+      },
+      { admNo: 'DPA-0908', roll: 8, name: 'Zoya Siddiqui', classNum: '9', section: 'A', elective: 'IT', attendance: 85,
+        marks: {
+          TERM1: { Mathematics: 53, Science: 55, English: 61, 'Social Science': 58, IT: 67 },
+          HALFYEARLY: { Mathematics: 55, Science: 57, English: 63, 'Social Science': 60, IT: 69 },
+          PREBOARD: { Mathematics: 58, Science: 59, English: 65, 'Social Science': 62, IT: 71 }
+        }
+      },
+
+      // ================= CLASS 9 - SECTION B (8 Students) =================
+      { admNo: 'DPA-0909', roll: 1, name: 'Rudransh Dubey', classNum: '9', section: 'B', elective: 'IT', attendance: 94,
+        marks: {
+          TERM1: { Mathematics: 88, Science: 87, English: 84, 'Social Science': 86, IT: 91 },
+          HALFYEARLY: { Mathematics: 90, Science: 89, English: 86, 'Social Science': 88, IT: 93 },
+          PREBOARD: { Mathematics: 92, Science: 91, English: 88, 'Social Science': 90, IT: 95 }
+        }
+      },
+      { admNo: 'DPA-0910', roll: 2, name: 'Kiara Sethi', classNum: '9', section: 'B', elective: 'Hindi', attendance: 91,
+        marks: {
+          TERM1: { Mathematics: 79, Science: 81, English: 86, 'Social Science': 82, Hindi: 85 },
+          HALFYEARLY: { Mathematics: 81, Science: 82, English: 88, 'Social Science': 84, Hindi: 87 },
+          PREBOARD: { Mathematics: 83, Science: 84, English: 89, 'Social Science': 85, Hindi: 88 }
+        }
+      },
+      { admNo: 'DPA-0911', roll: 3, name: 'Lakshya Bhardwaj', classNum: '9', section: 'B', elective: 'IT', attendance: 86,
+        marks: {
+          TERM1: { Mathematics: 71, Science: 70, English: 69, 'Social Science': 72, IT: 78 },
+          HALFYEARLY: { Mathematics: 73, Science: 72, English: 71, 'Social Science': 74, IT: 80 },
+          PREBOARD: { Mathematics: 75, Science: 74, English: 73, 'Social Science': 75, IT: 82 }
+        }
+      },
+      { admNo: 'DPA-0912', roll: 4, name: 'Ira Mukhopadhyay', classNum: '9', section: 'B', elective: 'Hindi', attendance: 85,
+        marks: {
+          TERM1: { Mathematics: 63, Science: 65, English: 72, 'Social Science': 67, Hindi: 73 },
+          HALFYEARLY: { Mathematics: 65, Science: 67, English: 74, 'Social Science': 69, Hindi: 75 },
+          PREBOARD: { Mathematics: 67, Science: 69, English: 75, 'Social Science': 71, Hindi: 77 }
+        }
+      },
+      { admNo: 'DPA-0913', roll: 5, name: 'Veer Choudhary', classNum: '9', section: 'B', elective: 'Hindi', attendance: 80,
+        marks: {
+          TERM1: { Mathematics: 52, Science: 54, English: 58, 'Social Science': 55, Hindi: 61 },
+          HALFYEARLY: { Mathematics: 50, Science: 53, English: 57, 'Social Science': 54, Hindi: 60 },
+          PREBOARD: { Mathematics: 54, Science: 56, English: 60, 'Social Science': 57, Hindi: 63 }
+        }
+      },
+      { admNo: 'DPA-0914', roll: 6, name: 'Aadhya Pandey', classNum: '9', section: 'B', elective: 'IT', attendance: 79,
+        marks: {
+          TERM1: { Mathematics: 46, Science: 48, English: 54, 'Social Science': 50, IT: 59 },
+          HALFYEARLY: { Mathematics: 48, Science: 50, English: 55, 'Social Science': 52, IT: 61 },
+          PREBOARD: { Mathematics: 50, Science: 52, English: 57, 'Social Science': 54, IT: 63 }
+        }
+      },
+      { admNo: 'DPA-0915', roll: 7, name: 'Nikhil Tomar', classNum: '9', section: 'B', elective: 'Hindi', attendance: 73,
+        marks: {
+          TERM1: { Mathematics: 36, Science: 39, English: 45, 'Social Science': 41, Hindi: 47 },
+          HALFYEARLY: { Mathematics: 35, Science: 38, English: 44, 'Social Science': 40, Hindi: 46 },
+          PREBOARD: { Mathematics: 38, Science: 41, English: 47, 'Social Science': 43, Hindi: 49 }
+        }
+      },
+      { admNo: 'DPA-0916', roll: 8, name: 'Ritika Soni', classNum: '9', section: 'B', elective: 'Hindi', attendance: 68,
+        marks: {
+          TERM1: { Mathematics: 26, Science: 33, English: 42, 'Social Science': 37, Hindi: 44 },
+          HALFYEARLY: { Mathematics: 28, Science: 34, English: 43, 'Social Science': 38, Hindi: 45 },
+          PREBOARD: { Mathematics: 30, Science: 36, English: 45, 'Social Science': 40, Hindi: 47 }
+        }
+      },
+
+      // ================= CLASS 9 - SECTION C (8 Students) =================
+      { admNo: 'DPA-0917', roll: 1, name: 'Krishnav Goyal', classNum: '9', section: 'C', elective: 'IT', attendance: 92,
+        marks: {
+          TERM1: { Mathematics: 84, Science: 83, English: 81, 'Social Science': 82, IT: 89 },
+          HALFYEARLY: { Mathematics: 86, Science: 85, English: 83, 'Social Science': 84, IT: 91 },
+          PREBOARD: { Mathematics: 88, Science: 87, English: 85, 'Social Science': 86, IT: 93 }
+        }
+      },
+      { admNo: 'DPA-0918', roll: 2, name: 'Manya Rajput', classNum: '9', section: 'C', elective: 'Hindi', attendance: 89,
+        marks: {
+          TERM1: { Mathematics: 74, Science: 76, English: 80, 'Social Science': 77, Hindi: 82 },
+          HALFYEARLY: { Mathematics: 76, Science: 78, English: 82, 'Social Science': 79, Hindi: 84 },
+          PREBOARD: { Mathematics: 78, Science: 80, English: 83, 'Social Science': 81, Hindi: 85 }
+        }
+      },
+      { admNo: 'DPA-0919', roll: 3, name: 'Pranav Gokhale', classNum: '9', section: 'C', elective: 'IT', attendance: 85,
+        marks: {
+          TERM1: { Mathematics: 66, Science: 64, English: 67, 'Social Science': 65, IT: 74 },
+          HALFYEARLY: { Mathematics: 68, Science: 66, English: 69, 'Social Science': 67, IT: 76 },
+          PREBOARD: { Mathematics: 70, Science: 68, English: 71, 'Social Science': 69, IT: 78 }
+        }
+      },
+      { admNo: 'DPA-0920', roll: 4, name: 'Shreya Nambiar', classNum: '9', section: 'C', elective: 'Hindi', attendance: 84,
+        marks: {
+          TERM1: { Mathematics: 59, Science: 61, English: 66, 'Social Science': 62, Hindi: 68 },
+          HALFYEARLY: { Mathematics: 61, Science: 63, English: 68, 'Social Science': 64, Hindi: 70 },
+          PREBOARD: { Mathematics: 63, Science: 65, English: 70, 'Social Science': 66, Hindi: 72 }
+        }
+      },
+      { admNo: 'DPA-0921', roll: 5, name: 'Omkar Patil', classNum: '9', section: 'C', elective: 'Hindi', attendance: 78,
+        marks: {
+          TERM1: { Mathematics: 48, Science: 50, English: 53, 'Social Science': 51, Hindi: 56 },
+          HALFYEARLY: { Mathematics: 46, Science: 49, English: 52, 'Social Science': 50, Hindi: 55 },
+          PREBOARD: { Mathematics: 49, Science: 52, English: 55, 'Social Science': 53, Hindi: 58 }
+        }
+      },
+      { admNo: 'DPA-0922', roll: 6, name: 'Divya Khandelwal', classNum: '9', section: 'C', elective: 'IT', attendance: 77,
+        marks: {
+          TERM1: { Mathematics: 42, Science: 44, English: 49, 'Social Science': 45, IT: 54 },
+          HALFYEARLY: { Mathematics: 44, Science: 46, English: 51, 'Social Science': 47, IT: 56 },
+          PREBOARD: { Mathematics: 46, Science: 48, English: 53, 'Social Science': 49, IT: 58 }
+        }
+      },
+      { admNo: 'DPA-0923', roll: 7, name: 'Saurabh Negi', classNum: '9', section: 'C', elective: 'Hindi', attendance: 71,
+        marks: {
+          TERM1: { Mathematics: 29, Science: 34, English: 41, 'Social Science': 37, Hindi: 43 },
+          HALFYEARLY: { Mathematics: 27, Science: 32, English: 40, 'Social Science': 35, Hindi: 42 },
+          PREBOARD: { Mathematics: 31, Science: 35, English: 43, 'Social Science': 38, Hindi: 45 }
+        }
+      },
+      { admNo: 'DPA-0924', roll: 8, name: 'Palak Mahajan', classNum: '9', section: 'C', elective: 'Hindi', attendance: 75,
+        marks: {
+          TERM1: { Mathematics: 35, Science: 37, English: 44, 'Social Science': 40, Hindi: 46 },
+          HALFYEARLY: { Mathematics: 37, Science: 39, English: 46, 'Social Science': 42, Hindi: 48 },
+          PREBOARD: { Mathematics: 39, Science: 41, English: 48, 'Social Science': 44, Hindi: 50 }
+        }
+      }
+    ];
+
+    // Global State
+    let activeTabId = 'tab-class-ranker';
+    let processedCohort = [];
+    let chartInstances = {};
+    let yoyCohortMode = 'SAME_CLASS'; // 'SAME_CLASS' | 'LONGITUDINAL'
+    let expandedMasterStudentRows = new Set();
+    let expandedYoYLedgerRows = new Set();
+
+    const SESSIONS_LIST = ['2023-24', '2024-25', '2025-26', '2026-27'];
+
+    // -------------------------------------------------------------------------
+    // 2. CORE COHORT CALCULATION & MULTI-YEAR DATA ENGINE
+    // -------------------------------------------------------------------------
+    function getGrade(score) {
+      if (score >= 91) return 'A1';
+      if (score >= 81) return 'A2';
+      if (score >= 71) return 'B1';
+      if (score >= 61) return 'B2';
+      if (score >= 51) return 'C1';
+      if (score >= 41) return 'C2';
+      if (score >= 33) return 'D';
+      return 'E';
+    }
+
+    function getDivision(pct, failedCount) {
+      if (failedCount > 0 || pct < 33) return 'Compartment';
+      if (pct >= 75) return 'Distinction';
+      if (pct >= 60) return 'First Division';
+      if (pct >= 45) return 'Second Division';
+      return 'Third Division';
+    }
+
+    function getPositionTier(rank, division) {
+      if (division === 'Compartment') return 'Need Improvement';
+      if (rank <= 3) return 'Merit List (1–3)';
+      if (rank <= 10) return 'Top 10 Scholar';
+      return 'Above Average';
+    }
+
+    function getSessionScoreAdjustment(session, studentIdx, subject, mode) {
+      if (session === '2026-27') return 0;
+      const yearStep = session === '2025-26' ? -1 : session === '2024-25' ? -2 : -3;
+      const subHash = subject.length % 3;
+      const studentVariance = ((studentIdx * 7 + subHash) % 5) - 2; // -2 to +2 deterministic variance
+      if (mode === 'LONGITUDINAL') {
+        // Longitudinal growth trajectory: students improve over 4 years, with individual variance
+        return yearStep * 2 + studentVariance;
+      }
+      // Same-class institutional cohort benchmark
+      return yearStep * 1.5 + studentVariance;
+    }
+
+    function computeCohortForSession(session, mode = 'SAME_CLASS') {
+      const examKey = document.getElementById('filter-exam').value;
+      const classFilter = document.getElementById('filter-class').value;
+      const sectionFilter = document.getElementById('filter-section').value;
+      const streamFilter = document.getElementById('filter-stream').value;
+
+      const filteredRaw = RAW_STUDENTS.filter(s => {
+        if (classFilter !== 'ALL' && s.classNum !== classFilter) return false;
+        if (sectionFilter !== 'ALL' && s.section !== sectionFilter) return false;
+        if (streamFilter !== 'ALL' && s.elective !== streamFilter) return false;
+        return true;
+      });
+
+      const enriched = filteredRaw.map((s, sIdx) => {
+        const rawExamMarks = s.marks[examKey] || s.marks.PREBOARD;
+        const examMarks = {};
+        Object.entries(rawExamMarks).forEach(([subj, baseScore]) => {
+          const adj = getSessionScoreAdjustment(session, sIdx, subj, mode);
+          examMarks[subj] = Math.round(Math.max(18, Math.min(100, baseScore + adj)));
+        });
+
+        const subjects = Object.keys(examMarks);
+        const maxMarks = subjects.length * 100;
+        const obtained = subjects.reduce((sum, sub) => sum + examMarks[sub], 0);
+        const percentage = Number(((obtained / maxMarks) * 100).toFixed(1));
+        const failedSubjects = subjects.filter(sub => examMarks[sub] < 33);
+        const division = getDivision(percentage, failedSubjects.length);
+        const grade = getGrade(percentage);
+
+        // Term progression across TERM1 -> HALFYEARLY -> PREBOARD
+        const termKeys = ['TERM1', 'HALFYEARLY', 'PREBOARD'];
+        const termPcts = termKeys.map(tk => {
+          const tMarks = s.marks[tk];
+          const tSum = Object.entries(tMarks).reduce((sum, [sub, val]) => {
+            const adj = getSessionScoreAdjustment(session, sIdx, sub, mode);
+            return sum + Math.round(Math.max(18, Math.min(100, val + adj)));
+          }, 0);
+          return Number(((tSum / maxMarks) * 100).toFixed(1));
+        });
+        const growthDelta = Number((termPcts[2] - termPcts[0]).toFixed(1));
+
+        // Compute 4-year percentage progression for this student
+        const yearlyPcts = SESSIONS_LIST.map(yr => {
+          const yrSum = Object.entries(rawExamMarks).reduce((a, [subj, b]) => {
+            const offset = getSessionScoreAdjustment(yr, sIdx, subj, 'LONGITUDINAL');
+            return a + Math.round(Math.max(18, Math.min(100, b + offset)));
+          }, 0);
+          return Number(((yrSum / maxMarks) * 100).toFixed(1));
+        });
+
+        // Compute 4-year subject-by-subject history & attendance history
+        const yearlySubjectMarks = {};
+        SESSIONS_LIST.forEach(yr => {
+          yearlySubjectMarks[yr] = {};
+          Object.entries(rawExamMarks).forEach(([subj, b]) => {
+            const offset = getSessionScoreAdjustment(yr, sIdx, subj, 'LONGITUDINAL');
+            yearlySubjectMarks[yr][subj] = Math.round(Math.max(18, Math.min(100, b + offset)));
+          });
+        });
+
+        const yearlyAttendance = SESSIONS_LIST.map((yr, idx) => {
+          const attShift = [-4, -2, -1, 0][idx];
+          return Math.max(62, Math.min(100, s.attendance + attShift));
+        });
+
+        const yoy1Delta = Number((yearlyPcts[3] - yearlyPcts[2]).toFixed(1));
+        const yoy4Delta = Number((yearlyPcts[3] - yearlyPcts[0]).toFixed(1));
+
+        let trajectoryLabel = 'Steady Climber';
+        if (yearlyPcts[3] >= 88 && yearlyPcts[0] >= 80) trajectoryLabel = 'Consistent Topper';
+        else if (yoy4Delta >= 7.0 && yearlyPcts[3] >= 65) trajectoryLabel = 'Rising Star';
+        else if (yearlyPcts[3] < 45 || yoy1Delta < 0) trajectoryLabel = 'Needs Attention';
+
+        return {
+          ...s,
+          examMarks,
+          obtained,
+          maxMarks,
+          percentage,
+          grade,
+          division,
+          failedSubjects,
+          isPass: failedSubjects.length === 0 && percentage >= 33,
+          growthDelta,
+          termPcts,
+          yearlyPcts,
+          yearlySubjectMarks,
+          yearlyAttendance,
+          yoy1Delta,
+          yoy4Delta,
+          trajectoryLabel
+        };
+      });
+
+      enriched.sort((a, b) => b.percentage - a.percentage || b.obtained - a.obtained);
+
+      const sectionCounters = {};
+      enriched.forEach((student, idx) => {
+        student.classRank = idx + 1;
+        const secKey = `${student.classNum}-${student.section}`;
+        sectionCounters[secKey] = (sectionCounters[secKey] || 0) + 1;
+        student.sectionRank = sectionCounters[secKey];
+        student.positionTier = getPositionTier(student.classRank, student.division);
+      });
+
+      // Compute historical cohort ranks for each student across 2023-24, 2024-25, 2025-26, 2026-27
+      const yearlyRanksByAdm = {};
+      SESSIONS_LIST.forEach((yr, yrIdx) => {
+        const sortedForYr = [...enriched].sort((a, b) => b.yearlyPcts[yrIdx] - a.yearlyPcts[yrIdx]);
+        sortedForYr.forEach((st, rIdx) => {
+          if (!yearlyRanksByAdm[st.admNo]) yearlyRanksByAdm[st.admNo] = [];
+          yearlyRanksByAdm[st.admNo][yrIdx] = rIdx + 1;
+        });
+      });
+
+      enriched.forEach(st => {
+        st.yearlyRanks = yearlyRanksByAdm[st.admNo] || [st.classRank, st.classRank, st.classRank, st.classRank];
+        st.yearlyDivisions = st.yearlyPcts.map((p, yrIdx) => {
+          const fails = Object.values(st.yearlySubjectMarks[SESSIONS_LIST[yrIdx]]).filter(v => v < 33).length;
+          return getDivision(p, fails);
+        });
+      });
+
+      return enriched;
+    }
+
+    function computeFilteredCohort() {
+      const session = document.getElementById('filter-session').value;
+      processedCohort = computeCohortForSession(session, 'SAME_CLASS');
+      return processedCohort;
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. KPI SUMMARY CARDS RENDERER
+    // -------------------------------------------------------------------------
+    function renderKPICards() {
+      const data = processedCohort;
+      const total = data.length;
+      const passed = data.filter(s => s.isPass).length;
+      const passRate = total ? ((passed / total) * 100).toFixed(1) : '0.0';
+      const avgPct = total ? (data.reduce((sum, s) => sum + s.percentage, 0) / total).toFixed(1) : '0.0';
+      const highest = total ? data[0] : null;
+      const distinctions = data.filter(s => s.division === 'Distinction').length;
+      const compartment = data.filter(s => s.division === 'Compartment').length;
+
+      document.getElementById('active-cohort-badge').innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        Showing ${total} Students
+      `;
+
+      const cards = [
+        {
+          label: 'Total Appeared',
+          value: total,
+          sub: '100% Exam Attendance',
+          icon: 'users',
+          color: 'text-slate-700',
+          bg: 'bg-slate-100'
+        },
+        {
+          label: 'Overall Pass %',
+          value: `${passRate}%`,
+          sub: `${passed} Passed / ${total - passed} Comp.`,
+          icon: 'check-circle-2',
+          color: 'text-emerald-700',
+          bg: 'bg-emerald-50'
+        },
+        {
+          label: 'Cohort Average',
+          value: `${avgPct}%`,
+          sub: 'Mean Aggregate Score',
+          icon: 'trending-up',
+          color: 'text-brand-700',
+          bg: 'bg-brand-50'
+        },
+        {
+          label: 'Highest Score',
+          value: highest ? `${highest.percentage}%` : '—',
+          sub: highest ? `${highest.name} (${highest.classNum}-${highest.section})` : 'No records',
+          icon: 'award',
+          color: 'text-amber-700',
+          bg: 'bg-amber-50'
+        },
+        {
+          label: 'Distinction (≥75%)',
+          value: distinctions,
+          sub: total ? `${((distinctions / total) * 100).toFixed(0)}% of Cohort` : '0%',
+          icon: 'sparkles',
+          color: 'text-indigo-700',
+          bg: 'bg-indigo-50'
+        },
+        {
+          label: 'At-Risk / Comp.',
+          value: compartment,
+          sub: 'Requires Remedial Plan',
+          icon: 'alert-triangle',
+          color: 'text-rose-700',
+          bg: 'bg-rose-50'
+        }
+      ];
+
+      document.getElementById('kpi-cards-container').innerHTML = cards.map(c => `
+        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-4 flex flex-col justify-between hover:border-slate-300 transition">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">${c.label}</span>
+            <div class="w-8 h-8 rounded-xl ${c.bg} ${c.color} flex items-center justify-center shrink-0">
+              <i data-lucide="${c.icon}" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div>
+            <div class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">${c.value}</div>
+            <p class="text-[11px] text-slate-500 mt-0.5 truncate">${c.sub}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. TAB 1: CLASS-WISE RANKER (CUSTOM RANGE)
+    // -------------------------------------------------------------------------
+    function setRankPreset(from, to) {
+      document.getElementById('rank-from').value = from;
+      document.getElementById('rank-to').value = to === 999 ? processedCohort.length || 50 : to;
+
+      document.querySelectorAll('.rank-preset-btn').forEach(btn => {
+        btn.className = 'rank-preset-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+      });
+      event.target.className = 'rank-preset-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-brand-700 shadow-sm transition';
+      renderClassRankerTab();
+    }
+
+    function renderClassRankerTab() {
+      const from = Math.max(1, parseInt(document.getElementById('rank-from').value) || 1);
+      const to = Math.max(from, parseInt(document.getElementById('rank-to').value) || 10);
+
+      // Podium Cards for Top 3 overall in current cohort
+      const top3 = processedCohort.slice(0, 3);
+      const medalStyles = [
+        { ring: 'border-amber-300 bg-gradient-to-br from-amber-50/90 to-white', badge: 'bg-amber-500 text-white', label: '1st Rank • Gold Medalist' },
+        { ring: 'border-slate-300 bg-gradient-to-br from-slate-100/80 to-white', badge: 'bg-slate-600 text-white', label: '2nd Rank • Silver Medalist' },
+        { ring: 'border-orange-300 bg-gradient-to-br from-orange-50/80 to-white', badge: 'bg-orange-600 text-white', label: '3rd Rank • Bronze Medalist' }
+      ];
+
+      document.getElementById('podium-cards').innerHTML = top3.map((s, idx) => `
+        <div onclick="openStudentModal('${s.admNo}')" class="cursor-pointer rounded-2xl border ${medalStyles[idx].ring} p-4 shadow-sm hover:shadow-md transition flex items-center justify-between gap-3">
+          <div>
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${medalStyles[idx].badge} mb-1.5">
+              ${medalStyles[idx].label}
+            </span>
+            <h4 class="text-sm font-bold text-slate-900">${s.name}</h4>
+            <p class="text-xs text-slate-500">Class ${s.classNum}-${s.section} • Adm: ${s.admNo}</p>
+          </div>
+          <div class="text-right">
+            <div class="text-xl font-extrabold text-slate-900">${s.percentage}%</div>
+            <div class="text-[11px] font-semibold text-slate-500">${s.obtained}/${s.maxMarks}</div>
+          </div>
+        </div>
+      `).join('');
+
+      // Custom Rank Range slice
+      const rangedStudents = processedCohort.filter(s => s.classRank >= from && s.classRank <= to);
+      const tbody = document.getElementById('class-ranker-tbody');
+
+      if (!rangedStudents.length) {
+        tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-sm text-slate-500">No students found in Rank ${from} to ${to} for selected filters.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rangedStudents.map(s => {
+        const rankBadge = s.classRank === 1
+          ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-300">🥇 #1</span>`
+          : s.classRank === 2
+          ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-slate-200 text-slate-800 border border-slate-300">🥈 #2</span>`
+          : s.classRank === 3
+          ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-orange-100 text-orange-800 border border-orange-300">🥉 #3</span>`
+          : `<span class="inline-flex items-center justify-center w-8 h-7 rounded-lg text-xs font-bold bg-slate-100 text-slate-700">#${s.classRank}</span>`;
+
+        const divColor = getDivisionBadgeClass(s.division);
+
+        return `
+          <tr class="hover:bg-slate-50/90 transition">
+            <td class="py-3 px-4">${rankBadge}</td>
+            <td class="py-3 px-4 font-mono text-xs text-slate-500">${s.admNo}</td>
+            <td class="py-3 px-4 font-semibold text-slate-900">${s.name}</td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-700">Class ${s.classNum}-${s.section}</span></td>
+            <td class="py-3 px-4 text-right text-slate-500">${s.maxMarks}</td>
+            <td class="py-3 px-4 text-right font-bold text-slate-800">${s.obtained}</td>
+            <td class="py-3 px-4 text-right font-extrabold text-brand-700">${s.percentage}%</td>
+            <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-md text-xs font-bold bg-indigo-50 text-indigo-700">${s.grade}</span></td>
+            <td class="py-3 px-4"><span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${divColor}">${s.division}</span></td>
+            <td class="py-3 px-4 text-right no-print">
+              <button onclick="openStudentModal('${s.admNo}')" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-brand-600 hover:bg-brand-50 border border-brand-200 transition">
+                <span>360° Card</span>
+                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. TAB 2: PERCENTAGE-WISE ANALYSIS (CUSTOM RANGE)
+    // -------------------------------------------------------------------------
+    function setPctRange(minVal, maxVal) {
+      document.getElementById('pct-min').value = minVal;
+      document.getElementById('pct-max').value = maxVal;
+      document.getElementById('pct-min-slider').value = Math.floor(minVal);
+      document.getElementById('pct-max-slider').value = Math.ceil(maxVal);
+      renderPercentageTab();
+    }
+
+    function syncPctSliders(source) {
+      let minVal = parseFloat(document.getElementById('pct-min-slider').value);
+      let maxVal = parseFloat(document.getElementById('pct-max-slider').value);
+      if (source === 'min' && minVal > maxVal) {
+        maxVal = minVal;
+        document.getElementById('pct-max-slider').value = maxVal;
+      }
+      if (source === 'max' && maxVal < minVal) {
+        minVal = maxVal;
+        document.getElementById('pct-min-slider').value = minVal;
+      }
+      document.getElementById('pct-min').value = minVal;
+      document.getElementById('pct-max').value = maxVal;
+      renderPercentageTab();
+    }
+
+    function renderPercentageTab() {
+      const minPct = Math.max(0, parseFloat(document.getElementById('pct-min').value) || 0);
+      const maxPct = Math.min(100, parseFloat(document.getElementById('pct-max').value) || 100);
+
+      const brackets = [
+        { label: '90% – 100% (A1 Elite)', min: 90, max: 100, color: '#10b981' },
+        { label: '75% – 89.9% (Distinction)', min: 75, max: 89.99, color: '#6366f1' },
+        { label: '60% – 74.9% (1st Div)', min: 60, max: 74.99, color: '#0ea5e9' },
+        { label: '33% – 59.9% (2nd/3rd)', min: 33, max: 59.99, color: '#f59e0b' },
+        { label: 'Below 33% (At-Risk)', min: 0, max: 32.99, color: '#f43f5e' }
+      ];
+
+      const counts = brackets.map(b =>
+        processedCohort.filter(s => s.percentage >= b.min && s.percentage <= b.max).length
+      );
+
+      // Render Bracket Summary Pills
+      document.getElementById('pct-bracket-pills').innerHTML = brackets.map((b, i) => {
+        const share = processedCohort.length ? ((counts[i] / processedCohort.length) * 100).toFixed(0) : 0;
+        return `
+          <div onclick="setPctRange(${b.min}, ${b.max})" class="cursor-pointer bg-white border border-slate-200 rounded-xl px-2.5 py-2 flex items-center justify-between hover:border-brand-300 transition">
+            <div class="flex items-center gap-1.5 truncate">
+              <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${b.color}"></span>
+              <span class="text-[11px] font-semibold text-slate-700 truncate">${b.label.split(' (')[0]}</span>
+            </div>
+            <span class="text-xs font-extrabold text-slate-900 ml-1">${counts[i]} <span class="text-[10px] font-normal text-slate-400">(${share}%)</span></span>
+          </div>
+        `;
+      }).join('');
+
+      // Render Chart
+      destroyChart('percentageChart');
+      const ctx = document.getElementById('percentageChart').getContext('2d');
+      chartInstances['percentageChart'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['90–100%', '75–89.9%', '60–74.9%', '33–59.9%', '<33%'],
+          datasets: [{
+            label: 'Students',
+            data: counts,
+            backgroundColor: brackets.map(b => b.color),
+            borderRadius: 8,
+            barThickness: 28
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 2, font: { size: 11 } }, grid: { color: '#e2e8f0' } },
+            x: { ticks: { font: { size: 11, weight: '600' } }, grid: { display: false } }
+          }
+        }
+      });
+
+      // Filter Students in Custom Range
+      const matched = processedCohort.filter(s => s.percentage >= minPct && s.percentage <= maxPct);
+      document.getElementById('pct-window-summary').textContent =
+        `Showing ${matched.length} student${matched.length === 1 ? '' : 's'} scoring between ${minPct.toFixed(1)}% and ${maxPct.toFixed(1)}%`;
+
+      const tbody = document.getElementById('percentage-tbody');
+      if (!matched.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-xs text-slate-500">No students fall within ${minPct}% – ${maxPct}%.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = matched.map(s => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="py-2.5 px-3.5">
+            <div class="font-semibold text-slate-900 text-xs">${s.name}</div>
+            <div class="text-[10px] text-slate-400 font-mono">${s.admNo} • Rank #${s.classRank}</div>
+          </td>
+          <td class="py-2.5 px-3.5 text-xs font-medium text-slate-600">${s.classNum}-${s.section}</td>
+          <td class="py-2.5 px-3.5 text-right text-xs font-semibold text-slate-700">${s.obtained}/${s.maxMarks}</td>
+          <td class="py-2.5 px-3.5 text-right text-xs font-extrabold text-brand-700">${s.percentage}%</td>
+          <td class="py-2.5 px-3.5"><span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${getDivisionBadgeClass(s.division)}">${s.division}</span></td>
+          <td class="py-2.5 px-3.5 text-right no-print">
+            <button onclick="openStudentModal('${s.admNo}')" class="text-xs font-semibold text-brand-600 hover:underline">View</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. TAB 3: DIVISION & POSITION-WISE SUMMARY
+    // -------------------------------------------------------------------------
+    function renderDivisionTab() {
+      const divisions = [
+        { key: 'Distinction', label: 'Distinction', range: '≥ 75.0%', color: 'emerald' },
+        { key: 'First Division', label: '1st Division', range: '60% – 74.9%', color: 'indigo' },
+        { key: 'Second Division', label: '2nd Division', range: '45% – 59.9%', color: 'sky' },
+        { key: 'Third Division', label: '3rd Division', range: '33% – 44.9%', color: 'amber' },
+        { key: 'Compartment', label: 'Compartment', range: '< 33% / Sub Fail', color: 'rose' }
+      ];
+
+      // 5 Division Cards
+      document.getElementById('division-summary-cards').innerHTML = divisions.map(d => {
+        const count = processedCohort.filter(s => s.division === d.key).length;
+        const pct = processedCohort.length ? ((count / processedCohort.length) * 100).toFixed(1) : '0.0';
+        return `
+          <div onclick="document.getElementById('division-filter-select').value='${d.key}'; renderDivisionTab();" class="cursor-pointer rounded-2xl border border-${d.color}-200 bg-${d.color}-50/50 p-3.5 hover:shadow-sm transition">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-${d.color}-800">${d.label}</span>
+              <span class="text-[10px] font-semibold text-${d.color}-600 bg-white px-2 py-0.5 rounded-full border border-${d.color}-200">${d.range}</span>
+            </div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span class="text-2xl font-extrabold text-slate-900">${count}</span>
+              <span class="text-xs font-bold text-${d.color}-700">${pct}%</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Group by Class-Section for Cross-Tab Matrix
+      const secGroups = {};
+      processedCohort.forEach(s => {
+        const k = `Class ${s.classNum}-${s.section}`;
+        if (!secGroups[k]) secGroups[k] = [];
+        secGroups[k].push(s);
+      });
+
+      const secKeys = Object.keys(secGroups).sort();
+      document.getElementById('division-matrix-tbody').innerHTML = secKeys.map(sec => {
+        const list = secGroups[sec];
+        const cDist = list.filter(s => s.division === 'Distinction').length;
+        const c1st = list.filter(s => s.division === 'First Division').length;
+        const c2nd = list.filter(s => s.division === 'Second Division').length;
+        const c3rd = list.filter(s => s.division === 'Third Division').length;
+        const cComp = list.filter(s => s.division === 'Compartment').length;
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-2.5 px-3.5 font-bold text-slate-800 text-xs">${sec}</td>
+            <td class="py-2.5 px-3 text-center font-bold text-emerald-700 bg-emerald-50/30">${cDist}</td>
+            <td class="py-2.5 px-3 text-center font-bold text-indigo-700">${c1st}</td>
+            <td class="py-2.5 px-3 text-center font-bold text-sky-700">${c2nd}</td>
+            <td class="py-2.5 px-3 text-center font-bold text-amber-700">${c3rd}</td>
+            <td class="py-2.5 px-3 text-center font-bold text-rose-700 bg-rose-50/30">${cComp}</td>
+            <td class="py-2.5 px-3.5 text-right font-extrabold text-slate-900">${list.length}</td>
+          </tr>
+        `;
+      }).join('');
+
+      // Position Tiers
+      const tiers = ['Merit List (1–3)', 'Top 10 Scholar', 'Above Average', 'Need Improvement'];
+      document.getElementById('position-tiers-grid').innerHTML = tiers.map(t => {
+        const cnt = processedCohort.filter(s => s.positionTier === t).length;
+        return `
+          <div class="bg-white border border-slate-200 rounded-xl p-3">
+            <div class="text-[11px] font-semibold text-slate-500">${t}</div>
+            <div class="text-lg font-extrabold text-slate-900 mt-0.5">${cnt} <span class="text-xs font-normal text-slate-400">students</span></div>
+          </div>
+        `;
+      }).join('');
+
+      // Stacked Bar Chart
+      destroyChart('divisionChart');
+      const ctx = document.getElementById('divisionChart').getContext('2d');
+      chartInstances['divisionChart'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: secKeys,
+          datasets: [
+            { label: 'Distinction', data: secKeys.map(k => secGroups[k].filter(s => s.division === 'Distinction').length), backgroundColor: '#10b981', borderRadius: 4 },
+            { label: '1st Div', data: secKeys.map(k => secGroups[k].filter(s => s.division === 'First Division').length), backgroundColor: '#6366f1', borderRadius: 4 },
+            { label: '2nd Div', data: secKeys.map(k => secGroups[k].filter(s => s.division === 'Second Division').length), backgroundColor: '#0ea5e9', borderRadius: 4 },
+            { label: '3rd Div', data: secKeys.map(k => secGroups[k].filter(s => s.division === 'Third Division').length), backgroundColor: '#f59e0b', borderRadius: 4 },
+            { label: 'Compartment', data: secKeys.map(k => secGroups[k].filter(s => s.division === 'Compartment').length), backgroundColor: '#f43f5e', borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 } } },
+            y: { stacked: true, beginAtZero: true, ticks: { stepSize: 2, font: { size: 11 } } }
+          },
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } }
+        }
+      });
+
+      // Drilldown Roster
+      const selectedDiv = document.getElementById('division-filter-select').value;
+      const drillList = selectedDiv === 'ALL' ? processedCohort : processedCohort.filter(s => s.division === selectedDiv);
+      document.getElementById('division-drilldown-title').textContent =
+        selectedDiv === 'ALL' ? `Complete Position & Division Roster (${drillList.length})` : `${selectedDiv} Roster (${drillList.length} Students)`;
+
+      document.getElementById('division-roster-tbody').innerHTML = drillList.map(s => `
+        <tr class="hover:bg-slate-50">
+          <td class="py-2.5 px-4 text-xs font-semibold text-slate-700">${s.positionTier}</td>
+          <td class="py-2.5 px-4 font-semibold text-slate-900 text-xs">${s.name} <span class="text-slate-400 font-mono">(${s.admNo})</span></td>
+          <td class="py-2.5 px-4 text-xs text-slate-600">${s.classNum}-${s.section}</td>
+          <td class="py-2.5 px-4 text-right font-bold text-slate-900 text-xs">${s.percentage}%</td>
+          <td class="py-2.5 px-4"><span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${getDivisionBadgeClass(s.division)}">${s.division}</span></td>
+          <td class="py-2.5 px-4 text-xs text-rose-600 font-medium">${s.failedSubjects.length ? s.failedSubjects.join(', ') : '—'}</td>
+          <td class="py-2.5 px-4 text-right no-print">
+            <button onclick="openStudentModal('${s.admNo}')" class="text-xs font-semibold text-brand-600 hover:underline">360°</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // -------------------------------------------------------------------------
+    // 7. TAB 4: SUBJECT-WISE RANKER & DIFFICULTY INDEX
+    // -------------------------------------------------------------------------
+    function renderSubjectTab() {
+      const subjects = ['Mathematics', 'Science', 'English', 'Social Science', 'Hindi', 'IT'];
+      const subjectStats = subjects.map(subj => {
+        const entries = processedCohort
+          .filter(s => s.examMarks[subj] !== undefined)
+          .map(s => ({ student: s, score: s.examMarks[subj] }))
+          .sort((a, b) => b.score - a.score);
+
+        const count = entries.length;
+        const avg = count ? (entries.reduce((sum, e) => sum + e.score, 0) / count) : 0;
+        const passed = entries.filter(e => e.score >= 33).length;
+        const passPct = count ? ((passed / count) * 100) : 0;
+        const highest = count ? entries[0].score : 0;
+        const lowest = count ? entries[count - 1].score : 0;
+        const topper = count ? entries[0].student : null;
+
+        // Difficulty Index based on subject average
+        let difficulty = { label: 'Balanced / Moderate', badge: 'bg-sky-50 text-sky-700 border-sky-200' };
+        if (avg < 66) difficulty = { label: 'High Rigor / Tough', badge: 'bg-rose-50 text-rose-700 border-rose-200' };
+        else if (avg >= 78) difficulty = { label: 'High Scoring', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
+
+        return { subj, entries, count, avg, passPct, highest, lowest, topper, difficulty };
+      });
+
+      // Render 6 Subject Overview Cards
+      document.getElementById('subject-overview-cards').innerHTML = subjectStats.map(st => `
+        <div onclick="document.getElementById('subject-focus-select').value='${st.subj}'; renderSubjectTab();" class="cursor-pointer rounded-2xl border border-slate-200 p-4 hover:border-brand-300 hover:shadow-sm transition bg-slate-50/40">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <h4 class="text-sm font-bold text-slate-900">${st.subj}</h4>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${st.difficulty.badge}">${st.difficulty.label}</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 my-3 bg-white rounded-xl p-2.5 border border-slate-100 text-center">
+            <div>
+              <div class="text-[10px] text-slate-400 uppercase font-semibold">Mean</div>
+              <div class="text-sm font-extrabold text-brand-700">${st.avg.toFixed(1)}%</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-slate-400 uppercase font-semibold">Pass %</div>
+              <div class="text-sm font-extrabold text-emerald-700">${st.passPct.toFixed(0)}%</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-slate-400 uppercase font-semibold">High / Low</div>
+              <div class="text-sm font-extrabold text-slate-800">${st.highest}/${st.lowest}</div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-xs text-slate-600">
+            <span>🏆 Topper: <strong class="text-slate-900">${st.topper ? st.topper.name : '—'}</strong></span>
+            <span class="font-bold text-amber-700">${st.highest}/100</span>
+          </div>
+        </div>
+      `).join('');
+
+      // Focused Subject Leaderboard
+      const focusSubj = document.getElementById('subject-focus-select').value;
+      const focusObj = subjectStats.find(s => s.subj === focusSubj) || subjectStats[0];
+      const classFilter = document.getElementById('filter-class').value;
+      const matchedTeachers = TEACHER_DIRECTORY.filter(t => t.subject === focusSubj && (classFilter === 'ALL' || t.classNum === classFilter));
+
+      document.getElementById('subject-leaderboard-title').textContent = `Top 10 Subject Rankers — ${focusSubj}`;
+      document.getElementById('subject-teacher-badge').textContent =
+        `Faculty: ${matchedTeachers.map(t => t.name).join(' & ') || 'Department Faculty'}`;
+
+      const topEntries = focusObj.entries.slice(0, 10);
+      document.getElementById('subject-ranker-tbody').innerHTML = topEntries.map((e, idx) => {
+        const diff = (e.score - focusObj.avg).toFixed(1);
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-2.5 px-4 font-bold text-xs text-slate-700">#${idx + 1}</td>
+            <td class="py-2.5 px-4 font-semibold text-xs text-slate-900">${e.student.name}</td>
+            <td class="py-2.5 px-4 text-xs text-slate-500">${e.student.classNum}-${e.student.section}</td>
+            <td class="py-2.5 px-4 text-right font-extrabold text-sm text-brand-700">${e.score}</td>
+            <td class="py-2.5 px-4 text-right text-xs font-semibold text-emerald-600">+${diff}</td>
+            <td class="py-2.5 px-4 text-center"><span class="px-2 py-0.5 rounded text-xs font-bold bg-indigo-50 text-indigo-700">${getGrade(e.score)}</span></td>
+          </tr>
+        `;
+      }).join('');
+
+      // Subject Benchmark Chart
+      destroyChart('subjectChart');
+      const ctx = document.getElementById('subjectChart').getContext('2d');
+      chartInstances['subjectChart'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: subjectStats.map(s => s.subj),
+          datasets: [
+            { label: 'Subject Avg %', data: subjectStats.map(s => Number(s.avg.toFixed(1))), backgroundColor: '#6366f1', borderRadius: 6 },
+            { label: 'Pass %', data: subjectStats.map(s => Number(s.passPct.toFixed(1))), backgroundColor: '#10b981', borderRadius: 6 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, max: 100, ticks: { font: { size: 11 } } },
+            x: { ticks: { font: { size: 10, weight: '600' } }, grid: { display: false } }
+          },
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } }
+        }
+      });
+    }
+
+    // -------------------------------------------------------------------------
+    // 8. TAB 5: STUDENT-WISE 360° MASTER LEDGER & INLINE MULTI-YEAR EXPANDER
+    // -------------------------------------------------------------------------
+    function toggleMasterStudentRow(admNo) {
+      if (expandedMasterStudentRows.has(admNo)) expandedMasterStudentRows.delete(admNo);
+      else expandedMasterStudentRows.add(admNo);
+      renderStudent360Tab();
+    }
+
+    function jumpToStudentYoY(admNo) {
+      switchTab('tab-yoy');
+      const primarySelect = document.getElementById('yoy-student-primary');
+      if (primarySelect) {
+        primarySelect.value = admNo;
+        renderStudentYoYDeepDive();
+      }
+      const sectionEl = document.getElementById('yoy-student-deepdive-section');
+      if (sectionEl) sectionEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderStudent360Tab() {
+      const query = (document.getElementById('student-search-input').value || '').trim().toLowerCase();
+      const sortBy = document.getElementById('student-sort-select').value;
+
+      let list = processedCohort.filter(s =>
+        s.name.toLowerCase().includes(query) ||
+        s.admNo.toLowerCase().includes(query) ||
+        `${s.classNum}-${s.section}`.toLowerCase().includes(query)
+      );
+
+      list.sort((a, b) => {
+        if (sortBy === 'yoy4') return b.yoy4Delta - a.yoy4Delta;
+        if (sortBy === 'yoy1') return b.yoy1Delta - a.yoy1Delta;
+        if (sortBy === 'growth') return b.growthDelta - a.growthDelta;
+        if (sortBy === 'attendance') return b.attendance - a.attendance;
+        if (sortBy === 'name') return a.name.localeCompare(b.name);
+        return a.classRank - b.classRank;
+      });
+
+      const tbody = document.getElementById('student360-tbody');
+      if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-xs text-slate-500">No students match "${query}".</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(s => {
+        const isExpanded = expandedMasterStudentRows.has(s.admNo);
+        const subPills = Object.entries(s.examMarks).map(([sub, sc]) => {
+          const shortSub = sub === 'Social Science' ? 'SST' : (sub === 'Mathematics' ? 'Math' : sub.slice(0, 3));
+          const pillCls = sc >= 85 ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+            : sc < 33 ? 'bg-rose-50 text-rose-700 border-rose-200 font-bold'
+            : 'bg-slate-100 text-slate-700 border-slate-200';
+          return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] ${pillCls}">${shortSub}: <strong>${sc}</strong></span>`;
+        }).join(' ');
+
+        const baseGrade = parseInt(s.classNum, 10) || 10;
+        const subKeys = Object.keys(s.examMarks);
+
+        const drawerHtml = isExpanded ? `
+          <tr class="bg-slate-50/90">
+            <td colspan="10" class="p-4 border-t border-b border-brand-200">
+              <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <span class="text-xs font-bold text-slate-900">Complete 4-Year Subject-by-Subject Growth History — ${s.name} (${s.admNo})</span>
+                    <p class="text-[11px] text-slate-500">Tracking longitudinal progression from Class ${baseGrade - 3} (2023–24) to Class ${baseGrade} (2026–27)</p>
+                  </div>
+                  <button onclick="jumpToStudentYoY('${s.admNo}')" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-600 text-white hover:bg-brand-700 transition">
+                    <i data-lucide="git-compare" class="w-3.5 h-3.5"></i>
+                    <span>Open Full YoY Chart & Peer Compare</span>
+                  </button>
+                </div>
+                <div class="overflow-x-auto rounded-lg border border-slate-200">
+                  <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-500 uppercase">
+                        <th class="py-2 px-3">Subject</th>
+                        ${SESSIONS_LIST.map((yr, idx) => `<th class="py-2 px-3 text-center ${idx === 3 ? 'bg-brand-50/60 text-brand-800' : ''}">${yr} (Cls ${baseGrade - 3 + idx})</th>`).join('')}
+                        <th class="py-2 px-3 text-center">YoY Δ (25→26)</th>
+                        <th class="py-2 px-3 text-right">4-Yr Net Gain</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                      ${subKeys.map(sub => {
+                        const m0 = s.yearlySubjectMarks['2023-24'][sub];
+                        const m1 = s.yearlySubjectMarks['2024-25'][sub];
+                        const m2 = s.yearlySubjectMarks['2025-26'][sub];
+                        const m3 = s.yearlySubjectMarks['2026-27'][sub];
+                        const d1 = m3 - m2;
+                        const d4 = m3 - m0;
+                        return `
+                          <tr>
+                            <td class="py-2 px-3 font-semibold text-slate-800">${sub}</td>
+                            <td class="py-2 px-3 text-center text-slate-600">${m0}</td>
+                            <td class="py-2 px-3 text-center text-slate-600">${m1}</td>
+                            <td class="py-2 px-3 text-center text-slate-700 font-medium">${m2}</td>
+                            <td class="py-2 px-3 text-center font-extrabold text-brand-700 bg-brand-50/40">${m3}</td>
+                            <td class="py-2 px-3 text-center">${formatDeltaBadge(d1, ' pts')}</td>
+                            <td class="py-2 px-3 text-right font-bold ${d4 >= 0 ? 'text-emerald-700' : 'text-rose-600'}">${d4 >= 0 ? '+' : ''}${d4} pts</td>
+                          </tr>
+                        `;
+                      }).join('')}
+                      <tr class="bg-slate-50 font-bold">
+                        <td class="py-2 px-3 text-slate-900">Aggregate % & Class Rank</td>
+                        ${SESSIONS_LIST.map((yr, idx) => `
+                          <td class="py-2 px-3 text-center ${idx === 3 ? 'bg-brand-50/60 text-brand-800' : 'text-slate-800'}">
+                            ${s.yearlyPcts[idx]}% <span class="text-[10px] font-normal text-slate-500">(#${s.yearlyRanks[idx]})</span>
+                          </td>
+                        `).join('')}
+                        <td class="py-2 px-3 text-center">${formatDeltaBadge(s.yoy1Delta, '%')}</td>
+                        <td class="py-2 px-3 text-right font-extrabold ${s.yoy4Delta >= 0 ? 'text-emerald-700' : 'text-rose-600'}">${s.yoy4Delta >= 0 ? '+' : ''}${s.yoy4Delta}%</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </td>
+          </tr>
+        ` : '';
+
+        return `
+          <tr class="hover:bg-slate-50 transition ${isExpanded ? 'bg-brand-50/30' : ''}">
+            <td class="py-3 px-3">
+              <div class="font-extrabold text-xs text-slate-900">#${s.classRank}</div>
+              <div class="text-[10px] text-slate-400">Sec #${s.sectionRank}</div>
+            </td>
+            <td class="py-3 px-3">
+              <div class="font-bold text-xs text-slate-900">${s.name}</div>
+              <div class="text-[10px] text-slate-500 font-mono">${s.admNo} • ${s.classNum}-${s.section} • Att ${s.attendance}%</div>
+            </td>
+            <td class="py-3 px-3">
+              <div class="flex flex-wrap gap-1 max-w-xs">${subPills}</div>
+            </td>
+            <td class="py-3 px-2.5 text-center text-xs text-slate-600">
+              <div class="font-semibold">${s.yearlyPcts[0]}%</div>
+              <div class="text-[10px] text-slate-400">Rank #${s.yearlyRanks[0]}</div>
+            </td>
+            <td class="py-3 px-2.5 text-center text-xs text-slate-600">
+              <div class="font-semibold">${s.yearlyPcts[1]}%</div>
+              <div class="text-[10px] text-slate-400">Rank #${s.yearlyRanks[1]}</div>
+            </td>
+            <td class="py-3 px-2.5 text-center text-xs text-slate-700">
+              <div class="font-bold">${s.yearlyPcts[2]}%</div>
+              <div class="text-[10px] text-slate-400">Rank #${s.yearlyRanks[2]}</div>
+            </td>
+            <td class="py-3 px-2.5 text-right bg-brand-50/30">
+              <div class="font-extrabold text-xs text-brand-700">${s.percentage}%</div>
+              <div class="text-[10px] text-slate-500">${s.obtained}/${s.maxMarks}</div>
+            </td>
+            <td class="py-3 px-2.5 text-center">${formatDeltaBadge(s.yoy1Delta, '%')}</td>
+            <td class="py-3 px-2.5 text-center font-extrabold text-xs ${s.yoy4Delta >= 0 ? 'text-emerald-700' : 'text-rose-600'}">
+              ${s.yoy4Delta >= 0 ? '+' : ''}${s.yoy4Delta}%
+            </td>
+            <td class="py-3 px-3 text-right no-print">
+              <div class="inline-flex items-center gap-1.5">
+                <button onclick="toggleMasterStudentRow('${s.admNo}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                  ${isExpanded ? 'Hide 4-Yr' : '4-Yr History'}
+                </button>
+                <button onclick="openStudentModal('${s.admNo}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200 hover:bg-brand-100 transition">
+                  360°
+                </button>
+              </div>
+            </td>
+          </tr>
+          ${drawerHtml}
+        `;
+      }).join('');
+    }
+
+    // -------------------------------------------------------------------------
+    // 9. TAB 6: TEACHER SUBJECT-WISE PERFORMANCE ACCOUNTABILITY
+    // -------------------------------------------------------------------------
+    function renderTeacherTab() {
+      const classFilter = document.getElementById('filter-class').value;
+      const activeTeachers = TEACHER_DIRECTORY.filter(t => classFilter === 'ALL' || t.classNum === classFilter);
+
+      const teacherMetrics = activeTeachers.map(t => {
+        const students = processedCohort.filter(s =>
+          s.classNum === t.classNum &&
+          t.sections.includes(s.section) &&
+          s.examMarks[t.subject] !== undefined
+        );
+        const count = students.length;
+        const scores = students.map(s => s.examMarks[t.subject]);
+        const avg = count ? scores.reduce((a, b) => a + b, 0) / count : 0;
+        const passed = scores.filter(sc => sc >= 33).length;
+        const passPct = count ? (passed / count) * 100 : 0;
+        const highest = count ? Math.max(...scores) : 0;
+        const club90 = scores.filter(sc => sc >= 90).length;
+        const fails = scores.filter(sc => sc < 33).length;
+
+        // Appraisal Index out of 100
+        const appraisal = Number(((passPct * 0.5) + (avg * 0.4) + (Math.min(club90, 5) * 2)).toFixed(1));
+        return { ...t, count, avg, passPct, highest, club90, fails, appraisal };
+      }).sort((a, b) => b.appraisal - a.appraisal);
+
+      // Chart
+      destroyChart('teacherChart');
+      const ctx = document.getElementById('teacherChart').getContext('2d');
+      chartInstances['teacherChart'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: teacherMetrics.map(t => `${t.name.replace(/^(Dr\.|Mrs\.|Ms\.|Mr\.)\s*/, '')} (${t.subject.slice(0, 4)})`),
+          datasets: [{
+            label: 'Subject Mean %',
+            data: teacherMetrics.map(t => Number(t.avg.toFixed(1))),
+            backgroundColor: '#0d9488',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          scales: {
+            x: { beginAtZero: true, max: 100, ticks: { font: { size: 10 } } },
+            y: { ticks: { font: { size: 10, weight: '600' } }, grid: { display: false } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      // Top 3 Faculty Highlight Cards
+      const topFac = teacherMetrics.slice(0, 3);
+      document.getElementById('teacher-highlights').innerHTML = topFac.map((t, idx) => `
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between gap-3">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
+              #${idx + 1} Faculty Index • ${t.subject}
+            </span>
+            <h4 class="text-sm font-bold text-slate-900 mt-1">${t.name}</h4>
+            <p class="text-[11px] text-slate-500">Class ${t.classNum} • Pass Rate: ${t.passPct.toFixed(0)}% • ${t.club90} Distinctions</p>
+          </div>
+          <div class="text-right">
+            <div class="text-lg font-extrabold text-teal-700">${t.appraisal}</div>
+            <div class="text-[10px] text-slate-400 font-semibold">Index Score</div>
+          </div>
+        </div>
+      `).join('');
+
+      // Table
+      document.getElementById('teacher-tbody').innerHTML = teacherMetrics.map(t => `
+        <tr class="hover:bg-slate-50">
+          <td class="py-3 px-4">
+            <div class="font-bold text-xs text-slate-900">${t.name}</div>
+            <div class="text-[10px] font-mono text-slate-400">${t.id}</div>
+          </td>
+          <td class="py-3 px-4 font-semibold text-xs text-brand-700">${t.subject}</td>
+          <td class="py-3 px-4 text-xs text-slate-600">Class ${t.classNum} (${t.sections.join(', ')})</td>
+          <td class="py-3 px-3 text-center text-xs font-semibold text-slate-700">${t.count}</td>
+          <td class="py-3 px-3 text-right font-bold text-xs text-slate-900">${t.avg.toFixed(1)}%</td>
+          <td class="py-3 px-3 text-right font-bold text-xs ${t.passPct >= 90 ? 'text-emerald-600' : 'text-amber-600'}">${t.passPct.toFixed(1)}%</td>
+          <td class="py-3 px-3 text-center text-xs font-bold text-slate-800">${t.highest}</td>
+          <td class="py-3 px-3 text-center text-xs font-bold text-indigo-700">${t.club90}</td>
+          <td class="py-3 px-3 text-center text-xs font-bold ${t.fails > 0 ? 'text-rose-600' : 'text-slate-400'}">${t.fails}</td>
+          <td class="py-3 px-4 text-right">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-teal-50 text-teal-800 border border-teal-200">${t.appraisal} / 100</span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // -------------------------------------------------------------------------
+    // 10. TAB 7: SECTION-WISE COMPARATIVE ANALYTICS
+    // -------------------------------------------------------------------------
+    function renderSectionTab() {
+      const secGroups = {};
+      processedCohort.forEach(s => {
+        const key = `${s.classNum}-${s.section}`;
+        if (!secGroups[key]) secGroups[key] = [];
+        secGroups[key].push(s);
+      });
+
+      const keys = Object.keys(secGroups).sort();
+      const stats = keys.map(k => {
+        const list = secGroups[k].sort((a, b) => b.percentage - a.percentage);
+        const count = list.length;
+        const passed = list.filter(s => s.isPass).length;
+        const passPct = count ? (passed / count) * 100 : 0;
+        const meanPct = count ? list.reduce((sum, s) => sum + s.percentage, 0) / count : 0;
+        const mid = Math.floor(count / 2);
+        const medianPct = count ? (count % 2 !== 0 ? list[mid].percentage : (list[mid - 1].percentage + list[mid].percentage) / 2) : 0;
+        const highest = count ? list[0] : null;
+        const distinctions = list.filter(s => s.division === 'Distinction').length;
+        return { key: k, count, passPct, meanPct, medianPct, highest, distinctions };
+      });
+
+      // Top 3 Section Cards
+      document.getElementById('section-cards-grid').innerHTML = stats.slice(0, 3).map(st => `
+        <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-sm font-extrabold text-slate-900">Class ${st.key}</h4>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Pass: ${st.passPct.toFixed(0)}%</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 bg-white rounded-xl p-2.5 border border-slate-100 text-center my-2.5">
+            <div>
+              <div class="text-[10px] text-slate-400 uppercase font-semibold">Mean %</div>
+              <div class="text-sm font-extrabold text-brand-700">${st.meanPct.toFixed(1)}%</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-slate-400 uppercase font-semibold">Median %</div>
+              <div class="text-sm font-extrabold text-slate-800">${st.medianPct.toFixed(1)}%</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-slate-400 uppercase font-semibold">Distinction</div>
+              <div class="text-sm font-extrabold text-indigo-700">${st.distinctions}/${st.count}</div>
+            </div>
+          </div>
+          <div class="text-xs text-slate-600 flex items-center justify-between">
+            <span>Section Topper: <strong class="text-slate-900">${st.highest ? st.highest.name : '—'}</strong></span>
+            <span class="font-bold text-amber-700">${st.highest ? st.highest.percentage + '%' : ''}</span>
+          </div>
+        </div>
+      `).join('');
+
+      // Grouped Bar Chart
+      destroyChart('sectionChart');
+      const ctx = document.getElementById('sectionChart').getContext('2d');
+      chartInstances['sectionChart'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: stats.map(s => `Cls ${s.key}`),
+          datasets: [
+            { label: 'Pass %', data: stats.map(s => Number(s.passPct.toFixed(1))), backgroundColor: '#10b981', borderRadius: 5 },
+            { label: 'Mean %', data: stats.map(s => Number(s.meanPct.toFixed(1))), backgroundColor: '#6366f1', borderRadius: 5 },
+            { label: 'Median %', data: stats.map(s => Number(s.medianPct.toFixed(1))), backgroundColor: '#f59e0b', borderRadius: 5 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, max: 100, ticks: { font: { size: 11 } } },
+            x: { ticks: { font: { size: 11, weight: '600' } }, grid: { display: false } }
+          },
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } }
+        }
+      });
+
+      // Comparison Table
+      document.getElementById('section-tbody').innerHTML = stats.map(st => `
+        <tr class="hover:bg-slate-50">
+          <td class="py-3 px-3.5 font-bold text-xs text-slate-900">Class ${st.key}</td>
+          <td class="py-3 px-3 text-center text-xs text-slate-600">${st.count}</td>
+          <td class="py-3 px-3 text-right font-bold text-xs text-emerald-700">${st.passPct.toFixed(1)}%</td>
+          <td class="py-3 px-3 text-right font-extrabold text-xs text-brand-700">${st.meanPct.toFixed(1)}%</td>
+          <td class="py-3 px-3 text-right text-xs font-semibold text-slate-700">${st.medianPct.toFixed(1)}%</td>
+          <td class="py-3 px-3 text-right font-bold text-xs text-amber-700">${st.highest ? st.highest.percentage + '%' : '—'}</td>
+          <td class="py-3 px-3 text-center text-xs font-bold text-indigo-700">${st.distinctions}</td>
+          <td class="py-3 px-3.5 text-xs font-semibold text-slate-800">${st.highest ? st.highest.name : '—'}</td>
+        </tr>
+      `).join('');
+    }
+
+    // -------------------------------------------------------------------------
+    // 10B. TAB 8: YEAR-ON-YEAR (YoY) MULTI-SESSION COMPARISON ENGINE
+    // -------------------------------------------------------------------------
+    function setYoYMode(mode) {
+      yoyCohortMode = mode;
+      const sameBtn = document.getElementById('yoy-mode-same');
+      const longBtn = document.getElementById('yoy-mode-longitudinal');
+
+      if (mode === 'SAME_CLASS') {
+        sameBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-brand-700 shadow-sm transition';
+        longBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+        document.getElementById('yoy-mode-description').textContent =
+          'Benchmarking consecutive Class cohorts across 2023–24, 2024–25, 2025–26, and 2026–27 for identical grade-level standards.';
+        document.getElementById('yoy-cohort-tag').textContent = 'Mode: Same-Grade Institutional Benchmark';
+      } else {
+        longBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-brand-700 shadow-sm transition';
+        sameBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+        const targetClass = document.getElementById('filter-class').value === '9' ? '9' : '10';
+        const gradePath = targetClass === '10'
+          ? 'Class 7 (2023–24) → Class 8 (2024–25) → Class 9 (2025–26) → Class 10 (2026–27)'
+          : 'Class 6 (2023–24) → Class 7 (2024–25) → Class 8 (2025–26) → Class 9 (2026–27)';
+        document.getElementById('yoy-mode-description').textContent =
+          `Tracking the exact same cohort longitudinally across promotions: ${gradePath}.`;
+        document.getElementById('yoy-cohort-tag').textContent = `Mode: Longitudinal Cohort (${gradePath.split(' → ')[0]} → ${gradePath.split(' → ')[3]})`;
+      }
+
+      renderYoYTab();
+    }
+
+    function formatDeltaBadge(val, suffix = '%', invertGood = false) {
+      const num = Number(val);
+      if (Math.abs(num) < 0.05) {
+        return `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600">0.0${suffix}</span>`;
+      }
+      const isPositive = num > 0;
+      const isGood = invertGood ? !isPositive : isPositive;
+      const cls = isGood
+        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+        : 'bg-rose-50 text-rose-700 border border-rose-200';
+      const arrow = isPositive ? '▲ +' : '▼ ';
+      return `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold ${cls}">${arrow}${num.toFixed(1)}${suffix}</span>`;
+    }
+
+    function renderYoYTab() {
+      const baselineYear = document.getElementById('yoy-baseline-select').value;
+      const targetClass = document.getElementById('filter-class').value;
+
+      // Compute full cohort stats for all 4 sessions
+      const sessionDataMap = {};
+      SESSIONS_LIST.forEach(yr => {
+        const list = computeCohortForSession(yr, yoyCohortMode);
+        const total = list.length || 1;
+        const passed = list.filter(s => s.isPass).length;
+        const passPct = Number(((passed / total) * 100).toFixed(1));
+        const meanPct = Number((list.reduce((sum, s) => sum + s.percentage, 0) / total).toFixed(1));
+        const distCount = list.filter(s => s.division === 'Distinction').length;
+        const distPct = Number(((distCount / total) * 100).toFixed(1));
+        const club90Count = list.filter(s => s.percentage >= 90).length;
+        const compCount = list.filter(s => s.division === 'Compartment').length;
+
+        sessionDataMap[yr] = {
+          yr,
+          list,
+          total: list.length,
+          passed,
+          passPct,
+          meanPct,
+          distCount,
+          distPct,
+          club90Count,
+          compCount
+        };
+      });
+
+      const curr = sessionDataMap['2026-27'];
+      const base = sessionDataMap[baselineYear];
+
+      // 1. Render 4 Multi-Year YoY KPI Cards
+      const passDelta = curr.passPct - base.passPct;
+      const meanDelta = curr.meanPct - base.meanPct;
+      const distDelta = curr.distCount - base.distCount;
+      const compDelta = curr.compCount - base.compCount;
+
+      const yoyCards = [
+        {
+          title: 'School Pass % YoY Growth',
+          currVal: `${curr.passPct}%`,
+          baseVal: `${base.passPct}% in ${baselineYear}`,
+          deltaBadge: formatDeltaBadge(passDelta, '%'),
+          icon: 'check-circle-2',
+          accent: 'emerald'
+        },
+        {
+          title: 'Average Aggregate % Delta',
+          currVal: `${curr.meanPct}%`,
+          baseVal: `${base.meanPct}% in ${baselineYear}`,
+          deltaBadge: formatDeltaBadge(meanDelta, '%'),
+          icon: 'trending-up',
+          accent: 'brand'
+        },
+        {
+          title: 'Distinction (≥75%) Count',
+          currVal: `${curr.distCount} Students`,
+          baseVal: `${base.distCount} in ${baselineYear} (${curr.club90Count} in 90%+)`,
+          deltaBadge: formatDeltaBadge(distDelta, ' stu'),
+          icon: 'award',
+          accent: 'indigo'
+        },
+        {
+          title: 'Compartment Reduction',
+          currVal: `${curr.compCount} Students`,
+          baseVal: `${base.compCount} in ${baselineYear}`,
+          deltaBadge: formatDeltaBadge(compDelta, ' stu', true),
+          icon: 'shield-check',
+          accent: 'amber'
+        }
+      ];
+
+      document.getElementById('yoy-kpi-cards').innerHTML = yoyCards.map(c => `
+        <div class="rounded-2xl border border-slate-200 bg-slate-50/40 p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">${c.title}</span>
+            ${c.deltaBadge}
+          </div>
+          <div class="text-2xl font-extrabold text-slate-900 tracking-tight my-1">${c.currVal}</div>
+          <div class="text-[11px] text-slate-500 font-medium">Baseline: ${c.baseVal}</div>
+        </div>
+      `).join('');
+
+      // 2. Render 4-Year Grouped Bar & Trend Line Combo Chart
+      destroyChart('yoyTrendChart');
+      const ctx = document.getElementById('yoyTrendChart').getContext('2d');
+      const xLabels = SESSIONS_LIST.map((yr, idx) => {
+        if (yoyCohortMode === 'SAME_CLASS') return yr;
+        const startGrade = targetClass === '9' ? 6 : 7;
+        return `${yr} (Cls ${startGrade + idx})`;
+      });
+
+      chartInstances['yoyTrendChart'] = new Chart(ctx, {
+        data: {
+          labels: xLabels,
+          datasets: [
+            {
+              type: 'line',
+              label: 'Pass % Trajectory',
+              data: SESSIONS_LIST.map(yr => sessionDataMap[yr].passPct),
+              borderColor: '#10b981',
+              backgroundColor: '#10b981',
+              borderWidth: 3,
+              pointRadius: 5,
+              tension: 0.3,
+              yAxisID: 'y'
+            },
+            {
+              type: 'bar',
+              label: 'Mean Aggregate %',
+              data: SESSIONS_LIST.map(yr => sessionDataMap[yr].meanPct),
+              backgroundColor: '#4f46e5',
+              borderRadius: 6,
+              barPercentage: 0.55,
+              yAxisID: 'y'
+            },
+            {
+              type: 'bar',
+              label: 'Distinction Share %',
+              data: SESSIONS_LIST.map(yr => sessionDataMap[yr].distPct),
+              backgroundColor: '#0ea5e9',
+              borderRadius: 6,
+              barPercentage: 0.55,
+              yAxisID: 'y'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, max: 100, ticks: { font: { size: 11 } }, grid: { color: '#e2e8f0' } },
+            x: { ticks: { font: { size: 11, weight: '600' } }, grid: { display: false } }
+          },
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 11, font: { size: 11 } } }
+          }
+        }
+      });
+
+      // 3. Render Division Shift & Quality Pyramid Table
+      const divisionRows = [
+        { key: 'Distinction', label: '1st Div with Distinction (≥75%)', dot: 'bg-emerald-500', invert: false },
+        { key: 'First Division', label: 'First Division (60–74.9%)', dot: 'bg-indigo-500', invert: false },
+        { key: 'Second Division', label: 'Second Division (45–59.9%)', dot: 'bg-sky-500', invert: false },
+        { key: 'Third Division', label: 'Third Division (33–44.9%)', dot: 'bg-amber-500', invert: true },
+        { key: 'Compartment', label: 'Compartment / Re-Appear (<33%)', dot: 'bg-rose-500', invert: true }
+      ];
+
+      document.getElementById('yoy-division-tbody').innerHTML = divisionRows.map(d => {
+        const counts = SESSIONS_LIST.map(yr => sessionDataMap[yr].list.filter(s => s.division === d.key).length);
+        const shift = counts[3] - sessionDataMap[baselineYear].list.filter(s => s.division === d.key).length;
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-2.5 px-3.5 font-semibold text-slate-800 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full ${d.dot} shrink-0"></span>
+              <span>${d.label}</span>
+            </td>
+            <td class="py-2.5 px-2.5 text-center text-slate-600">${counts[0]}</td>
+            <td class="py-2.5 px-2.5 text-center text-slate-600">${counts[1]}</td>
+            <td class="py-2.5 px-2.5 text-center text-slate-700 font-medium">${counts[2]}</td>
+            <td class="py-2.5 px-2.5 text-center font-extrabold text-brand-700 bg-brand-50/40">${counts[3]}</td>
+            <td class="py-2.5 px-3 text-right">${formatDeltaBadge(shift, '', d.invert)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      const currTopTier = curr.list.filter(s => s.division === 'Distinction' || s.division === 'First Division').length;
+      const baseTopTier = base.list.filter(s => s.division === 'Distinction' || s.division === 'First Division').length;
+      const topTierShareDelta = (((currTopTier / (curr.total || 1)) - (baseTopTier / (base.total || 1))) * 100).toFixed(1);
+      document.getElementById('yoy-quality-summary').textContent =
+        `${Number(topTierShareDelta) >= 0 ? '+' : ''}${topTierShareDelta}% shift in First Division & Distinction share vs ${baselineYear}`;
+
+      // 4. Subject-Wise 4-Year Trend Matrix
+      const subjects = ['Mathematics', 'Science', 'English', 'Social Science', 'Hindi', 'IT'];
+      document.getElementById('yoy-subject-tbody').innerHTML = subjects.map(subj => {
+        const yrStats = SESSIONS_LIST.map(yr => {
+          const peers = sessionDataMap[yr].list.filter(s => s.examMarks[subj] !== undefined);
+          const cnt = peers.length || 1;
+          const avg = peers.reduce((sum, s) => sum + s.examMarks[subj], 0) / cnt;
+          const pass = (peers.filter(s => s.examMarks[subj] >= 33).length / cnt) * 100;
+          return { avg, pass };
+        });
+
+        const baseIdx = SESSIONS_LIST.indexOf(baselineYear);
+        const yoyMeanDelta = yrStats[3].avg - yrStats[baseIdx].avg;
+        const fourYrGain = yrStats[3].avg - yrStats[0].avg;
+
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-3 px-4 font-bold text-slate-900">${subj}</td>
+            ${yrStats.map((st, idx) => `
+              <td class="py-3 px-3 text-center ${idx === 3 ? 'bg-brand-50/40 font-extrabold text-brand-800' : 'text-slate-700'}">
+                <div>${st.avg.toFixed(1)}%</div>
+                <div class="text-[10px] ${idx === 3 ? 'text-emerald-700 font-bold' : 'text-slate-400'}">Pass: ${st.pass.toFixed(0)}%</div>
+              </td>
+            `).join('')}
+            <td class="py-3 px-3 text-right">${formatDeltaBadge(yoyMeanDelta, '%')}</td>
+            <td class="py-3 px-4 text-right font-extrabold ${fourYrGain >= 0 ? 'text-emerald-700' : 'text-rose-600'}">
+              ${fourYrGain >= 0 ? '+' : ''}${fourYrGain.toFixed(1)}%
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // 5. Teacher Year-on-Year Effectiveness Table
+      const activeTeachers = TEACHER_DIRECTORY.filter(t => targetClass === 'ALL' || t.classNum === targetClass);
+      document.getElementById('yoy-teacher-tbody').innerHTML = activeTeachers.map(t => {
+        const yrAvgs = SESSIONS_LIST.map(yr => {
+          const peers = sessionDataMap[yr].list.filter(s =>
+            s.classNum === t.classNum &&
+            t.sections.includes(s.section) &&
+            s.examMarks[t.subject] !== undefined
+          );
+          const cnt = peers.length || 1;
+          const avg = peers.reduce((sum, s) => sum + s.examMarks[t.subject], 0) / cnt;
+          const pass = (peers.filter(s => s.examMarks[t.subject] >= 33).length / cnt) * 100;
+          return { avg, pass };
+        });
+
+        const baseIdx = SESSIONS_LIST.indexOf(baselineYear);
+        const facultyDelta = yrAvgs[3].avg - yrAvgs[baseIdx].avg;
+
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-3 px-4">
+              <div class="font-bold text-slate-900">${t.name}</div>
+              <div class="text-[10px] font-mono text-slate-400">${t.id}</div>
+            </td>
+            <td class="py-3 px-3">
+              <span class="font-semibold text-brand-700">${t.subject}</span>
+              <span class="text-slate-400 ml-1">(Cls ${t.classNum})</span>
+            </td>
+            <td class="py-3 px-3 text-right text-slate-600">${yrAvgs[0].avg.toFixed(1)}%</td>
+            <td class="py-3 px-3 text-right text-slate-600">${yrAvgs[1].avg.toFixed(1)}%</td>
+            <td class="py-3 px-3 text-right text-slate-700 font-medium">${yrAvgs[2].avg.toFixed(1)}%</td>
+            <td class="py-3 px-3 text-right font-extrabold text-brand-800 bg-brand-50/40">${yrAvgs[3].avg.toFixed(1)}%</td>
+            <td class="py-3 px-3 text-center font-bold text-emerald-700">${yrAvgs[3].pass.toFixed(0)}%</td>
+            <td class="py-3 px-4 text-right">${formatDeltaBadge(facultyDelta, '%')}</td>
+          </tr>
+        `;
+      }).join('');
+
+      // 6. Populate & Render Student Year-by-Year Deep-Dive Comparator & All-Students Ledger
+      populateStudentYoYDropdowns();
+      renderStudentYoYDeepDive();
+      renderMasterYoYStudentLedger();
+    }
+
+    function populateStudentYoYDropdowns() {
+      const primarySel = document.getElementById('yoy-student-primary');
+      const compareSel = document.getElementById('yoy-student-compare');
+      if (!primarySel || !compareSel || !processedCohort.length) return;
+
+      const prevPrimary = primarySel.value;
+      const prevCompare = compareSel.value;
+
+      primarySel.innerHTML = processedCohort.map(s =>
+        `<option value="${s.admNo}" class="text-slate-900">#${s.classRank} ${s.name} (${s.admNo} • ${s.classNum}-${s.section})</option>`
+      ).join('');
+
+      compareSel.innerHTML = `<option value="NONE" class="text-slate-900">— None (Single Student View) —</option>` +
+        processedCohort.map(s =>
+          `<option value="${s.admNo}" class="text-slate-900">#${s.classRank} ${s.name} (${s.admNo} • ${s.classNum}-${s.section})</option>`
+        ).join('');
+
+      if (processedCohort.some(s => s.admNo === prevPrimary)) primarySel.value = prevPrimary;
+      else primarySel.value = processedCohort[0].admNo;
+
+      if (prevCompare && (prevCompare === 'NONE' || processedCohort.some(s => s.admNo === prevCompare))) {
+        compareSel.value = prevCompare;
+      } else {
+        compareSel.value = 'NONE';
+      }
+    }
+
+    function renderStudentYoYDeepDive() {
+      const primaryAdm = document.getElementById('yoy-student-primary').value;
+      const compareAdm = document.getElementById('yoy-student-compare').value;
+      const s = processedCohort.find(st => st.admNo === primaryAdm) || processedCohort[0];
+      if (!s) return;
+
+      const peer = (compareAdm && compareAdm !== 'NONE' && compareAdm !== s.admNo)
+        ? processedCohort.find(st => st.admNo === compareAdm)
+        : null;
+
+      const baseGrade = parseInt(s.classNum, 10) || 10;
+      const gradeLabels = SESSIONS_LIST.map((yr, idx) => `${yr} (Cls ${baseGrade - 3 + idx})`);
+
+      // Update Table Column Headers
+      gradeLabels.forEach((lbl, idx) => {
+        const colEl = document.getElementById(`yoy-col-yr${idx}`);
+        if (colEl) colEl.textContent = lbl;
+      });
+
+      document.getElementById('yoy-matrix-student-title').textContent = peer
+        ? `4-Year Scorecard Comparison: ${s.name} vs ${peer.name}`
+        : `4-Year Subject-by-Subject Scorecard Matrix — ${s.name} (${s.admNo} • Class ${s.classNum}-${s.section})`;
+
+      const badgePill = document.getElementById('yoy-student-badge-pill');
+      badgePill.textContent = `${s.trajectoryLabel} (${s.yoy4Delta >= 0 ? '+' : ''}${s.yoy4Delta}% 4-Yr)`;
+      badgePill.className = `px-2.5 py-0.5 rounded-full text-[10px] font-bold ${getTrajectoryBadgeClass(s.trajectoryLabel)}`;
+
+      // Render 4 Milestone Cards (2023-24 -> 2026-27)
+      document.getElementById('yoy-student-milestones').innerHTML = SESSIONS_LIST.map((yr, idx) => {
+        const pct = s.yearlyPcts[idx];
+        const rk = s.yearlyRanks[idx];
+        const div = s.yearlyDivisions[idx];
+        const att = s.yearlyAttendance[idx];
+        const stepDelta = idx === 0 ? null : Number((pct - s.yearlyPcts[idx - 1]).toFixed(1));
+        const isCurrent = idx === 3;
+
+        return `
+          <div class="rounded-2xl border ${isCurrent ? 'border-brand-300 bg-brand-50/40' : 'border-slate-200 bg-white'} p-4 flex flex-col justify-between shadow-sm">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-extrabold ${isCurrent ? 'text-brand-800' : 'text-slate-700'}">${yr} • Class ${baseGrade - 3 + idx}</span>
+              ${stepDelta === null
+                ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500">Baseline Yr</span>`
+                : formatDeltaBadge(stepDelta, '%')}
+            </div>
+            <div class="my-2 flex items-baseline justify-between">
+              <span class="text-2xl font-extrabold text-slate-900">${pct}%</span>
+              <span class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md">Rank #${rk}</span>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
+              <span class="font-semibold text-slate-700">${div}</span>
+              <span>Att: ${att}%</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Render Trajectory Chart (Primary Student + Optional Peer Student)
+      destroyChart('studentYoYTrajectoryChart');
+      const ctx = document.getElementById('studentYoYTrajectoryChart').getContext('2d');
+      const datasets = [
+        {
+          label: `${s.name} (%)`,
+          data: s.yearlyPcts,
+          borderColor: '#4f46e5',
+          backgroundColor: 'rgba(79, 70, 229, 0.14)',
+          fill: !peer,
+          tension: 0.32,
+          pointRadius: 5,
+          pointBackgroundColor: '#4f46e5',
+          borderWidth: 3
+        }
+      ];
+
+      if (peer) {
+        datasets.push({
+          label: `${peer.name} (%)`,
+          data: peer.yearlyPcts,
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245, 158, 11, 0.12)',
+          fill: false,
+          borderDash: [5, 4],
+          tension: 0.32,
+          pointRadius: 5,
+          pointBackgroundColor: '#f59e0b',
+          borderWidth: 2.5
+        });
+      }
+
+      chartInstances['studentYoYTrajectoryChart'] = new Chart(ctx, {
+        type: 'line',
+        data: { labels: gradeLabels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { min: 20, max: 100, ticks: { font: { size: 11 } }, grid: { color: '#e2e8f0' } },
+            x: { ticks: { font: { size: 10, weight: '600' } }, grid: { display: false } }
+          },
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11, weight: '600' } } }
+          }
+        }
+      });
+
+      // Insight Summary Box
+      const rankGain = s.yearlyRanks[0] - s.yearlyRanks[3];
+      document.getElementById('yoy-student-insight-box').innerHTML = peer
+        ? `<strong>Head-to-Head Summary:</strong> <strong>${s.name}</strong> stands at <strong>${s.percentage}% (#${s.classRank})</strong> with a 4-year net gain of <strong>${s.yoy4Delta >= 0 ? '+' : ''}${s.yoy4Delta}%</strong>, compared to <strong>${peer.name}</strong> at <strong>${peer.percentage}% (#${peer.classRank})</strong> (${peer.yoy4Delta >= 0 ? '+' : ''}${peer.yoy4Delta}% 4-yr gain).`
+        : `<strong>4-Year Longitudinal Insight:</strong> Over 4 academic sessions, <strong>${s.name}</strong> achieved a net aggregate change of <strong class="${s.yoy4Delta >= 0 ? 'text-emerald-700' : 'text-rose-600'}">${s.yoy4Delta >= 0 ? '+' : ''}${s.yoy4Delta}%</strong> and moved <strong>${rankGain >= 0 ? `up ${rankGain} rank(s)` : `down ${Math.abs(rankGain)} rank(s)`}</strong> (from #${s.yearlyRanks[0]} in 2023–24 to #${s.yearlyRanks[3]} in 2026–27).`;
+
+      // Render 4-Year Subject-by-Subject Matrix Rows
+      const subKeys = Object.keys(s.examMarks);
+      const subjectRowsHtml = subKeys.map(sub => {
+        const vals = SESSIONS_LIST.map(yr => s.yearlySubjectMarks[yr][sub]);
+        const peerVals = peer ? SESSIONS_LIST.map(yr => peer.yearlySubjectMarks[yr]?.[sub] ?? '—') : null;
+        const yoyStep = vals[3] - vals[2];
+        const net4Yr = vals[3] - vals[0];
+
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-2.5 px-3.5 font-bold text-slate-800">${sub}</td>
+            ${vals.map((v, idx) => `
+              <td class="py-2.5 px-2.5 text-center ${idx === 3 ? 'bg-brand-50/40 font-extrabold text-brand-800' : 'text-slate-700'}">
+                <div>${v}</div>
+                ${peerVals ? `<div class="text-[10px] font-semibold text-amber-600">vs ${peerVals[idx]}</div>` : ''}
+              </td>
+            `).join('')}
+            <td class="py-2.5 px-2.5 text-center">${formatDeltaBadge(yoyStep, '')}</td>
+            <td class="py-2.5 px-3.5 text-right font-extrabold ${net4Yr >= 0 ? 'text-emerald-700' : 'text-rose-600'}">
+              ${net4Yr >= 0 ? '+' : ''}${net4Yr}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      const rankDelta = s.yearlyRanks[2] - s.yearlyRanks[3];
+      const summaryRowsHtml = `
+        <tr class="bg-slate-50/90 font-bold border-t-2 border-slate-200">
+          <td class="py-2.5 px-3.5 text-slate-900">Aggregate Percentage</td>
+          ${s.yearlyPcts.map((p, idx) => `
+            <td class="py-2.5 px-2.5 text-center ${idx === 3 ? 'bg-brand-100/60 font-extrabold text-brand-900' : 'text-slate-800'}">
+              <div>${p}%</div>
+              ${peer ? `<div class="text-[10px] font-semibold text-amber-700">vs ${peer.yearlyPcts[idx]}%</div>` : ''}
+            </td>
+          `).join('')}
+          <td class="py-2.5 px-2.5 text-center">${formatDeltaBadge(s.yoy1Delta, '%')}</td>
+          <td class="py-2.5 px-3.5 text-right font-extrabold ${s.yoy4Delta >= 0 ? 'text-emerald-700' : 'text-rose-600'}">
+            ${s.yoy4Delta >= 0 ? '+' : ''}${s.yoy4Delta}%
+          </td>
+        </tr>
+        <tr class="bg-slate-50/50">
+          <td class="py-2 px-3.5 font-semibold text-slate-700">Class Cohort Rank</td>
+          ${s.yearlyRanks.map((r, idx) => `
+            <td class="py-2 px-2.5 text-center font-bold ${idx === 3 ? 'text-indigo-700 bg-brand-50/30' : 'text-slate-600'}">
+              #${r}
+              ${peer ? `<span class="text-[10px] font-normal text-amber-600"> (vs #${peer.yearlyRanks[idx]})</span>` : ''}
+            </td>
+          `).join('')}
+          <td class="py-2 px-2.5 text-center text-[11px] font-bold ${rankDelta >= 0 ? 'text-emerald-700' : 'text-rose-600'}">
+            ${rankDelta >= 0 ? `▲ +${rankDelta}` : `▼ ${rankDelta}`}
+          </td>
+          <td class="py-2 px-3.5 text-right font-bold text-indigo-700">
+            ${rankGain >= 0 ? `+${rankGain} spots` : `${rankGain} spots`}
+          </td>
+        </tr>
+        <tr class="bg-slate-50/50">
+          <td class="py-2 px-3.5 font-semibold text-slate-700">Attendance %</td>
+          ${s.yearlyAttendance.map((att, idx) => `
+            <td class="py-2 px-2.5 text-center text-slate-600 ${idx === 3 ? 'bg-brand-50/30 font-semibold text-slate-800' : ''}">${att}%</td>
+          `).join('')}
+          <td class="py-2 px-2.5 text-center text-slate-500">+${s.yearlyAttendance[3] - s.yearlyAttendance[2]}%</td>
+          <td class="py-2 px-3.5 text-right font-semibold text-emerald-700">+${s.yearlyAttendance[3] - s.yearlyAttendance[0]}%</td>
+        </tr>
+      `;
+
+      document.getElementById('yoy-student-matrix-tbody').innerHTML = subjectRowsHtml + summaryRowsHtml;
+    }
+
+    function toggleYoYLedgerRow(admNo) {
+      if (expandedYoYLedgerRows.has(admNo)) expandedYoYLedgerRows.delete(admNo);
+      else expandedYoYLedgerRows.add(admNo);
+      renderMasterYoYStudentLedger();
+    }
+
+    function selectStudentForDeepDive(admNo) {
+      const primarySel = document.getElementById('yoy-student-primary');
+      if (primarySel) {
+        primarySel.value = admNo;
+        renderStudentYoYDeepDive();
+        document.getElementById('yoy-student-deepdive-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function getTrajectoryBadgeClass(label) {
+      if (label === 'Consistent Topper') return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+      if (label === 'Rising Star') return 'bg-indigo-50 text-indigo-700 border border-indigo-200';
+      if (label === 'Steady Climber') return 'bg-sky-50 text-sky-700 border border-sky-200';
+      return 'bg-rose-50 text-rose-700 border border-rose-200';
+    }
+
+    function renderMasterYoYStudentLedger() {
+      const query = (document.getElementById('yoy-ledger-search').value || '').trim().toLowerCase();
+      const trajFilter = document.getElementById('yoy-ledger-trajectory-filter').value;
+
+      const filtered = processedCohort.filter(s => {
+        if (trajFilter !== 'ALL' && s.trajectoryLabel !== trajFilter) return false;
+        if (query && !s.name.toLowerCase().includes(query) && !s.admNo.toLowerCase().includes(query)) return false;
+        return true;
+      });
+
+      const tbody = document.getElementById('yoy-master-students-tbody');
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="11" class="py-8 text-center text-xs text-slate-500">No students match the selected YoY trajectory filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(s => {
+        const isExpanded = expandedYoYLedgerRows.has(s.admNo);
+        const baseGrade = parseInt(s.classNum, 10) || 10;
+        const subKeys = Object.keys(s.examMarks);
+
+        // Mini SVG sparkline for 4-year percentage progression
+        const pts = s.yearlyPcts.map((p, idx) => {
+          const x = 6 + idx * 20;
+          const y = 24 - ((Math.max(20, Math.min(100, p)) - 20) / 80) * 18;
+          return `${x},${y.toFixed(1)}`;
+        }).join(' ');
+        const strokeColor = s.yoy4Delta >= 0 ? '#10b981' : '#f43f5e';
+
+        const expandedRow = isExpanded ? `
+          <tr class="bg-slate-50/90">
+            <td colspan="11" class="p-4 border-t border-b border-brand-200">
+              <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                  <span class="text-xs font-bold text-slate-900">Subject-Wise 4-Year Progression — ${s.name} (${s.admNo} • Class ${s.classNum}-${s.section})</span>
+                  <button onclick="selectStudentForDeepDive('${s.admNo}')" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-brand-600 text-white hover:bg-brand-700 transition">
+                    Load into Top Comparator & Chart
+                  </button>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                  ${subKeys.map(sub => {
+                    const y0 = s.yearlySubjectMarks['2023-24'][sub];
+                    const y1 = s.yearlySubjectMarks['2024-25'][sub];
+                    const y2 = s.yearlySubjectMarks['2025-26'][sub];
+                    const y3 = s.yearlySubjectMarks['2026-27'][sub];
+                    const diff = y3 - y0;
+                    return `
+                      <div class="rounded-lg border border-slate-200 bg-slate-50/60 p-2.5">
+                        <div class="flex items-center justify-between mb-1">
+                          <span class="text-[11px] font-bold text-slate-800">${sub}</span>
+                          <span class="text-[10px] font-extrabold ${diff >= 0 ? 'text-emerald-700' : 'text-rose-600'}">${diff >= 0 ? '+' : ''}${diff}</span>
+                        </div>
+                        <div class="text-[11px] text-slate-600 font-mono">
+                          ${y0} → ${y1} → ${y2} → <strong class="text-brand-700">${y3}</strong>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            </td>
+          </tr>
+        ` : '';
+
+        return `
+          <tr onclick="toggleYoYLedgerRow('${s.admNo}')" class="cursor-pointer hover:bg-slate-50 transition ${isExpanded ? 'bg-brand-50/30' : ''}">
+            <td class="py-2.5 px-3 text-center text-slate-400">
+              <i data-lucide="${isExpanded ? 'chevron-down' : 'chevron-right'}" class="w-4 h-4 inline"></i>
+            </td>
+            <td class="py-2.5 px-3">
+              <div class="font-bold text-slate-900">${s.name}</div>
+              <div class="text-[10px] font-mono text-slate-400">${s.admNo} • Class ${s.classNum}-${s.section}</div>
+            </td>
+            ${SESSIONS_LIST.map((yr, idx) => `
+              <td class="py-2.5 px-3 text-center ${idx === 3 ? 'bg-brand-50/40 font-extrabold text-brand-800' : 'text-slate-700'}">
+                <div>${s.yearlyPcts[idx]}% <span class="text-[10px] font-normal text-slate-400">(#${s.yearlyRanks[idx]})</span></div>
+                <div class="text-[9px] text-slate-400">Cls ${baseGrade - 3 + idx} • ${s.yearlyDivisions[idx].split(' ')[0]}</div>
+              </td>
+            `).join('')}
+            <td class="py-2.5 px-3 text-center">
+              <svg width="72" height="28" class="inline-block overflow-visible">
+                <polyline fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" points="${pts}" />
+                ${s.yearlyPcts.map((p, idx) => {
+                  const cx = 6 + idx * 20;
+                  const cy = 24 - ((Math.max(20, Math.min(100, p)) - 20) / 80) * 18;
+                  return `<circle cx="${cx}" cy="${cy.toFixed(1)}" r="2.5" fill="${strokeColor}" />`;
+                }).join('')}
+              </svg>
+            </td>
+            <td class="py-2.5 px-3 text-right">${formatDeltaBadge(s.yoy1Delta, '%')}</td>
+            <td class="py-2.5 px-3 text-right font-extrabold ${s.yoy4Delta >= 0 ? 'text-emerald-700' : 'text-rose-600'}">
+              ${s.yoy4Delta >= 0 ? '+' : ''}${s.yoy4Delta}%
+            </td>
+            <td class="py-2.5 px-3">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${getTrajectoryBadgeClass(s.trajectoryLabel)}">${s.trajectoryLabel}</span>
+            </td>
+            <td class="py-2.5 px-3 text-right no-print" onclick="event.stopPropagation()">
+              <button onclick="selectStudentForDeepDive('${s.admNo}')" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-brand-50 text-brand-700 border border-brand-200 hover:bg-brand-100 transition">
+                Compare
+              </button>
+            </td>
+          </tr>
+          ${expandedRow}
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    // -------------------------------------------------------------------------
+    // 11. STUDENT 360° REPORT CARD MODAL
+    // -------------------------------------------------------------------------
+    function openStudentModal(admNo) {
+      const s = processedCohort.find(item => item.admNo === admNo);
+      if (!s) return;
+
+      const initials = s.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+      document.getElementById('modal-avatar').textContent = initials;
+      document.getElementById('modal-student-name').textContent = s.name;
+      document.getElementById('modal-division-badge').textContent = `${s.division} (${s.grade})`;
+      document.getElementById('modal-student-meta').textContent =
+        `Adm No: ${s.admNo} • Class ${s.classNum}-${s.section} • Roll No: ${s.roll} • Attendance: ${s.attendance}%`;
+
+      document.getElementById('modal-kpi-strip').innerHTML = `
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+          <div class="text-[10px] font-bold uppercase text-slate-400">Aggregate %</div>
+          <div class="text-lg font-extrabold text-brand-700">${s.percentage}%</div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+          <div class="text-[10px] font-bold uppercase text-slate-400">Cohort Rank</div>
+          <div class="text-lg font-extrabold text-slate-900">#${s.classRank} <span class="text-xs font-normal text-slate-400">/ ${processedCohort.length}</span></div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+          <div class="text-[10px] font-bold uppercase text-slate-400">Section Rank</div>
+          <div class="text-lg font-extrabold text-indigo-700">#${s.sectionRank}</div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+          <div class="text-[10px] font-bold uppercase text-slate-400">Term Growth Δ</div>
+          <div class="text-lg font-extrabold ${s.growthDelta >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${s.growthDelta >= 0 ? '+' : ''}${s.growthDelta}%</div>
+        </div>
+      `;
+
+      // Subject Table & Radar Chart Data
+      const subLabels = Object.keys(s.examMarks);
+      const studentScores = subLabels.map(sub => s.examMarks[sub]);
+      const classAvgs = subLabels.map(sub => {
+        const peers = processedCohort.filter(p => p.examMarks[sub] !== undefined);
+        const avg = peers.reduce((sum, p) => sum + p.examMarks[sub], 0) / (peers.length || 1);
+        return Number(avg.toFixed(1));
+      });
+
+      document.getElementById('modal-subjects-tbody').innerHTML = subLabels.map((sub, idx) => {
+        const fac = TEACHER_DIRECTORY.find(t => t.subject === sub && t.classNum === s.classNum);
+        const sc = studentScores[idx];
+        return `
+          <tr>
+            <td class="py-2 px-3 font-bold text-slate-800">${sub}</td>
+            <td class="py-2 px-3 text-slate-500">${fac ? fac.name : 'Faculty'}</td>
+            <td class="py-2 px-3 text-right font-extrabold ${sc < 33 ? 'text-rose-600' : 'text-slate-900'}">${sc}/100</td>
+            <td class="py-2 px-3 text-right text-slate-500">${classAvgs[idx]}</td>
+            <td class="py-2 px-3 text-center font-bold text-brand-700">${getGrade(sc)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      // Remark & Term Pills
+      document.getElementById('modal-remark').textContent = s.isPass
+        ? `Consistent academic standing (${s.positionTier}). Maintain momentum in core subjects ahead of final board evaluation.`
+        : `Academic intervention advised in ${s.failedSubjects.join(', ')}. Schedule parent-faculty remedial review.`;
+
+      const termNames = ['Term-1', 'Half-Yr', 'Pre-Board'];
+      document.getElementById('modal-term-pills').innerHTML = s.termPcts.map((pct, i) => `
+        <div class="bg-white border border-brand-200 rounded-xl px-2.5 py-1.5 text-center">
+          <div class="text-[10px] text-slate-400 font-semibold">${termNames[i]}</div>
+          <div class="text-xs font-extrabold text-brand-800">${pct}%</div>
+        </div>
+      `).join('');
+
+      document.getElementById('student-modal').classList.remove('hidden');
+
+      // Render Radar Chart inside Modal
+      destroyChart('modalRadarChart');
+      const ctx = document.getElementById('modalRadarChart').getContext('2d');
+      chartInstances['modalRadarChart'] = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: subLabels.map(l => l === 'Social Science' ? 'SST' : l.slice(0, 4)),
+          datasets: [
+            {
+              label: s.name.split(' ')[0],
+              data: studentScores,
+              backgroundColor: 'rgba(79, 70, 229, 0.2)',
+              borderColor: '#4f46e5',
+              pointBackgroundColor: '#4f46e5',
+              borderWidth: 2
+            },
+            {
+              label: 'Cohort Avg',
+              data: classAvgs,
+              backgroundColor: 'rgba(148, 163, 184, 0.15)',
+              borderColor: '#94a3b8',
+              pointBackgroundColor: '#94a3b8',
+              borderWidth: 1.5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { r: { min: 0, max: 100, ticks: { display: false } } },
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+        }
+      });
+
+      // Render Multi-Year Academic Progression Chart inside Modal (2023-24 to 2026-27)
+      const fourYrDelta = Number((s.yearlyPcts[3] - s.yearlyPcts[0]).toFixed(1));
+      const yoyBadge = document.getElementById('modal-yoy-badge');
+      yoyBadge.textContent = `${fourYrDelta >= 0 ? '+' : ''}${fourYrDelta}% 4-Yr`;
+      yoyBadge.className = `px-2 py-0.5 rounded-full text-[10px] font-bold ${fourYrDelta >= 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`;
+
+      destroyChart('modalYoYChart');
+      const yoyCtx = document.getElementById('modalYoYChart').getContext('2d');
+      const baseGrade = parseInt(s.classNum, 10) || 10;
+      const modalYearLabels = SESSIONS_LIST.map((yr, idx) => `${yr} (Cls ${baseGrade - 3 + idx})`);
+
+      chartInstances['modalYoYChart'] = new Chart(yoyCtx, {
+        type: 'line',
+        data: {
+          labels: modalYearLabels,
+          datasets: [{
+            label: 'Aggregate %',
+            data: s.yearlyPcts,
+            borderColor: '#4f46e5',
+            backgroundColor: 'rgba(79, 70, 229, 0.12)',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 4,
+            pointBackgroundColor: '#4f46e5',
+            borderWidth: 2.5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { min: 20, max: 100, ticks: { font: { size: 10 } }, grid: { color: '#e2e8f0' } },
+            x: { ticks: { font: { size: 9, weight: '600' } }, grid: { display: false } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function closeStudentModal() {
+      document.getElementById('student-modal').classList.add('hidden');
+    }
+
+    // -------------------------------------------------------------------------
+    // 12. NAVIGATION, UTILITIES & CSV EXPORT
+    // -------------------------------------------------------------------------
+    function switchTab(tabId) {
+      activeTabId = tabId;
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.dataset.tab === tabId) {
+          btn.className = 'tab-btn active flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition bg-brand-600 text-white shadow-sm';
+        } else {
+          btn.className = 'tab-btn flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition text-slate-600 hover:bg-slate-100';
+        }
+      });
+
+      renderActiveTab();
+    }
+
+    function renderActiveTab() {
+      if (activeTabId === 'tab-class-ranker') renderClassRankerTab();
+      else if (activeTabId === 'tab-percentage') renderPercentageTab();
+      else if (activeTabId === 'tab-division') renderDivisionTab();
+      else if (activeTabId === 'tab-subject') renderSubjectTab();
+      else if (activeTabId === 'tab-student360') renderStudent360Tab();
+      else if (activeTabId === 'tab-teacher') renderTeacherTab();
+      else if (activeTabId === 'tab-section') renderSectionTab();
+      else if (activeTabId === 'tab-yoy') renderYoYTab();
+      lucide.createIcons();
+    }
+
+    function handleGlobalFilterChange() {
+      computeFilteredCohort();
+      renderKPICards();
+      renderActiveTab();
+      updatePrintHeader();
+    }
+
+    function resetGlobalFilters() {
+      document.getElementById('filter-session').value = '2026-27';
+      document.getElementById('filter-exam').value = 'PREBOARD';
+      document.getElementById('filter-class').value = '10';
+      document.getElementById('filter-section').value = 'ALL';
+      document.getElementById('filter-stream').value = 'ALL';
+      handleGlobalFilterChange();
+      showToast('Global examination filters reset to default');
+    }
+
+    function destroyChart(id) {
+      if (chartInstances[id]) {
+        chartInstances[id].destroy();
+        delete chartInstances[id];
+      }
+    }
+
+    function getDivisionBadgeClass(div) {
+      if (div === 'Distinction') return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+      if (div === 'First Division') return 'bg-indigo-50 text-indigo-700 border border-indigo-200';
+      if (div === 'Second Division') return 'bg-sky-50 text-sky-700 border border-sky-200';
+      if (div === 'Third Division') return 'bg-amber-50 text-amber-700 border border-amber-200';
+      return 'bg-rose-50 text-rose-700 border border-rose-200';
+    }
+
+    function exportCurrentViewCSV() {
+      if (activeTabId === 'tab-yoy') {
+        const headers = ['Admission_No', 'Student_Name', 'Class', 'Section', 'Stream', '2023_24_Pct', '2024_25_Pct', '2025_26_Pct', '2026_27_Pct', '4Yr_Net_Growth'];
+        const rows = processedCohort.map(s => [
+          s.admNo, `"${s.name}"`, s.classNum, s.section, s.elective,
+          s.yearlyPcts[0], s.yearlyPcts[1], s.yearlyPcts[2], s.yearlyPcts[3],
+          (s.yearlyPcts[3] - s.yearlyPcts[0]).toFixed(2)
+        ]);
+        const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `SchoolMitra_YoY_4Year_Comparison_${yoyCohortMode}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast('Year-on-Year (2023–27) Comparison exported as CSV');
+        return;
+      }
+
+      const headers = ['Class_Rank', 'Section_Rank', 'Admission_No', 'Student_Name', 'Class', 'Section', 'Stream', 'Obtained_Marks', 'Max_Marks', 'Percentage', 'Grade', 'Division', 'Attendance_Pct'];
+      const rows = processedCohort.map(s => [
+        s.classRank, s.sectionRank, s.admNo, `"${s.name}"`, s.classNum, s.section, s.elective,
+        s.obtained, s.maxMarks, s.percentage, s.grade, `"${s.division}"`, s.attendance
+      ]);
+
+      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `SchoolMitra_360_Exam_Report_${document.getElementById('filter-exam').value}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('360° Examination Report exported as CSV');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').textContent = msg;
+      toast.classList.remove('hidden', 'translate-y-4', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-4', 'opacity-0');
+        setTimeout(() => toast.classList.add('hidden'), 300);
+      }, 2800);
+    }
+
+    function updatePrintHeader() {
+      const examText = document.getElementById('filter-exam').selectedOptions[0].text;
+      const classText = document.getElementById('filter-class').selectedOptions[0].text;
+      document.getElementById('print-subtitle').textContent = `Session ${document.getElementById('filter-session').value} • ${examText} • ${classText}`;
+      document.getElementById('print-date').textContent = `Printed on ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}`;
+    }
+
+    // Initialize Application on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      computeFilteredCohort();
+      renderKPICards();
+      renderClassRankerTab();
+      updatePrintHeader();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
