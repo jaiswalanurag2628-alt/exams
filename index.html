@@ -626,20 +626,41 @@
     <!-- TAB 6: TEACHER SUBJECT-WISE PERFORMANCE ACCOUNTABILITY                -->
     <!-- ===================================================================== -->
     <div id="tab-teacher" class="tab-panel hidden space-y-5">
-      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5">
-        <div class="pb-4 border-b border-slate-100">
-          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-            <span class="w-7 h-7 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center text-xs font-extrabold">06</span>
-            Teacher Subject-Wise Performance & Faculty Appraisal Index
-          </h3>
-          <p class="text-xs text-slate-500 mt-0.5">Granular faculty effectiveness matrix mapping Teacher → Class & Section → Subject → Pass %, Mean Score, 90+ Distinctions & Appraisal Rating</p>
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 space-y-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center text-xs font-extrabold">06</span>
+              Teacher Subject-Wise Performance & Faculty Appraisal Intelligence
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Comprehensive faculty accountability covering Appraisal Index, Section-by-Section Delivery, Term-on-Term Value-Add, and 4-Year Consistency</p>
+          </div>
+
+          <!-- Faculty Deep-Dive Selector -->
+          <div class="flex flex-wrap items-center gap-2.5 no-print">
+            <div class="flex items-center gap-2 bg-teal-50/70 border border-teal-200 rounded-xl px-3 py-1.5">
+              <i data-lucide="award" class="w-4 h-4 text-teal-700"></i>
+              <span class="text-[11px] font-bold text-teal-900 uppercase">Inspect Faculty:</span>
+              <select id="teacher-focus-select" onchange="renderTeacherDeepDive()" class="bg-transparent text-xs font-bold text-teal-800 focus:outline-none cursor-pointer pr-1">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Individual Faculty 360° Appraisal Banner & Section Breakdown -->
+        <div id="teacher-deepdive-card" class="rounded-2xl border border-teal-200/80 bg-gradient-to-br from-teal-50/60 via-white to-slate-50 p-4 sm:p-5 space-y-4">
+          <!-- Populated dynamically via renderTeacherDeepDive() -->
         </div>
 
         <!-- Chart + KPI Highlight -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-5">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div class="lg:col-span-7 bg-slate-50/70 rounded-2xl border border-slate-200/80 p-4">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Faculty Subject Mean Score Comparison</h4>
-            <p class="text-[11px] text-slate-500 mb-3">Average marks delivered by each teacher across assigned sections</p>
+            <div class="flex items-center justify-between mb-1">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700">Faculty Subject Mean & Pass % Benchmark</h4>
+              <span class="text-[11px] font-semibold text-teal-700">Sorted by Appraisal Index</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mb-3">Average marks & pass rate delivered by each faculty member across assigned sections</p>
             <div class="relative h-64">
               <canvas id="teacherChart"></canvas>
             </div>
@@ -648,70 +669,34 @@
           <div class="lg:col-span-5 flex flex-col justify-between gap-3" id="teacher-highlights"></div>
         </div>
 
-        <!-- Teacher Accountability Table -->
-        <div class="overflow-x-auto rounded-xl border border-slate-200">
-          <table class="w-full text-left border-collapse text-sm">
-            <thead>
-              <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                <th class="py-3 px-4">Faculty Name & ID</th>
-                <th class="py-3 px-4">Subject</th>
-                <th class="py-3 px-4">Assigned Batch</th>
-                <th class="py-3 px-3 text-center">Students</th>
-                <th class="py-3 px-3 text-right">Sub. Avg</th>
-                <th class="py-3 px-3 text-right">Pass %</th>
-                <th class="py-3 px-3 text-center">Highest</th>
-                <th class="py-3 px-3 text-center">90+ Club</th>
-                <th class="py-3 px-3 text-center">Fail (<33)</th>
-                <th class="py-3 px-4 text-right">Appraisal Index</th>
-              </tr>
-            </thead>
-            <tbody id="teacher-tbody" class="divide-y divide-slate-100"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===================================================================== -->
-    <!-- TAB 7: SECTION-WISE COMPARATIVE ANALYTICS                             -->
-    <!-- ===================================================================== -->
-    <div id="tab-section" class="tab-panel hidden space-y-5">
-      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5">
-        <div class="pb-4 border-b border-slate-100">
-          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-            <span class="w-7 h-7 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center text-xs font-extrabold">07</span>
-            Section-Wise Comparative Analytics
-          </h3>
-          <p class="text-xs text-slate-500 mt-0.5">Head-to-head benchmarking across Sections A, B, and C on Pass %, Mean, Median, Highest Score, and Section Toppers</p>
-        </div>
-
-        <!-- Section Comparison Cards -->
-        <div id="section-cards-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4 my-5"></div>
-
-        <!-- Grouped Bar Chart & Comparison Table -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div class="lg:col-span-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 p-4">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Multi-Metric Section Benchmark</h4>
-            <p class="text-[11px] text-slate-500 mb-3">Comparing Pass %, Mean %, Median %, and Highest % per section</p>
-            <div class="relative h-64">
-              <canvas id="sectionChart"></canvas>
+        <!-- Teacher Accountability Table (Click any row to expand Section-by-Section & 4-Yr Breakdown) -->
+        <div>
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div>
+              <h4 class="text-sm font-bold text-slate-900">Complete Faculty Accountability Ledger</h4>
+              <p class="text-xs text-slate-500">Click any faculty row to inspect section-by-section results (Sec A, B, C), Term-1 → Pre-Board gain, and 4-year trend</p>
             </div>
+            <span class="text-[11px] font-semibold text-teal-700 bg-teal-50 px-2.5 py-1 rounded-full border border-teal-200">Click row for Section & YoY Details</span>
           </div>
 
-          <div class="lg:col-span-7 overflow-x-auto rounded-xl border border-slate-200">
+          <div class="overflow-x-auto rounded-xl border border-slate-200">
             <table class="w-full text-left border-collapse text-sm">
               <thead>
                 <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  <th class="py-3 px-3.5">Class & Sec</th>
-                  <th class="py-3 px-3 text-center">Strength</th>
-                  <th class="py-3 px-3 text-right">Pass %</th>
-                  <th class="py-3 px-3 text-right">Mean %</th>
-                  <th class="py-3 px-3 text-right">Median %</th>
-                  <th class="py-3 px-3 text-right">Highest %</th>
-                  <th class="py-3 px-3 text-center">Distinctions</th>
-                  <th class="py-3 px-3.5">Section Topper</th>
+                  <th class="py-3 px-3 w-8"></th>
+                  <th class="py-3 px-3">Faculty Name & ID</th>
+                  <th class="py-3 px-3">Subject & Batch</th>
+                  <th class="py-3 px-2.5 text-center">Students</th>
+                  <th class="py-3 px-2.5 text-right">Sub. Avg</th>
+                  <th class="py-3 px-2.5 text-right">Term Δ</th>
+                  <th class="py-3 px-2.5 text-right">Pass %</th>
+                  <th class="py-3 px-2.5 text-center">90+ Club</th>
+                  <th class="py-3 px-2.5 text-center">Fail (<33)</th>
+                  <th class="py-3 px-2.5 text-right">YoY Δ</th>
+                  <th class="py-3 px-3 text-right">Appraisal Index</th>
                 </tr>
               </thead>
-              <tbody id="section-tbody" class="divide-y divide-slate-100"></tbody>
+              <tbody id="teacher-tbody" class="divide-y divide-slate-100"></tbody>
             </table>
           </div>
         </div>
@@ -1457,6 +1442,9 @@
     let yoyCohortMode = 'SAME_CLASS'; // 'SAME_CLASS' | 'LONGITUDINAL'
     let expandedMasterStudentRows = new Set();
     let expandedYoYLedgerRows = new Set();
+    let expandedTeacherRows = new Set();
+    let cachedTeacherMetrics = [];
+    let cachedSessionDataMap = {};
 
     const SESSIONS_LIST = ['2023-24', '2024-25', '2025-26', '2026-27'];
 
@@ -2308,11 +2296,237 @@
     // -------------------------------------------------------------------------
     // 9. TAB 6: TEACHER SUBJECT-WISE PERFORMANCE ACCOUNTABILITY
     // -------------------------------------------------------------------------
+    function toggleTeacherRow(teacherId) {
+      if (expandedTeacherRows.has(teacherId)) expandedTeacherRows.delete(teacherId);
+      else expandedTeacherRows.add(teacherId);
+      renderTeacherTableRows();
+    }
+
+    function inspectTeacherFromRow(teacherId) {
+      const sel = document.getElementById('teacher-focus-select');
+      if (sel) {
+        sel.value = teacherId;
+        renderTeacherDeepDive();
+        document.getElementById('teacher-deepdive-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function getAppraisalTier(score) {
+      if (score >= 92) return { label: 'Exemplary (A+)', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
+      if (score >= 84) return { label: 'Proficient (A)', cls: 'bg-teal-50 text-teal-700 border-teal-200' };
+      if (score >= 75) return { label: 'Commendable (B+)', cls: 'bg-indigo-50 text-indigo-700 border-indigo-200' };
+      return { label: 'Needs Mentoring (B)', cls: 'bg-amber-50 text-amber-700 border-amber-200' };
+    }
+
+    function renderTeacherDeepDive() {
+      const sel = document.getElementById('teacher-focus-select');
+      if (!sel || !cachedTeacherMetrics.length) return;
+      const t = cachedTeacherMetrics.find(item => item.id === sel.value) || cachedTeacherMetrics[0];
+      if (!t) return;
+
+      const tier = getAppraisalTier(t.appraisal);
+      const container = document.getElementById('teacher-deepdive-card');
+
+      container.innerHTML = `
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-teal-200/70">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-teal-700 text-white flex items-center justify-center font-extrabold text-base shadow-sm shrink-0">
+              ${t.name.replace(/^(Dr\.|Mrs\.|Ms\.|Mr\.)\s*/, '').split(' ').map(n => n[0]).join('').slice(0, 2)}
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h4 class="text-base font-extrabold text-slate-900">${t.name}</h4>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${tier.cls}">${tier.label}</span>
+                <span class="text-xs font-mono text-slate-500">${t.id}</span>
+              </div>
+              <p class="text-xs text-slate-600 mt-0.5">
+                Subject: <strong class="text-teal-800">${t.subject}</strong> • Assigned Cohort: <strong>Class ${t.classNum} (Sections ${t.sections.join(', ')})</strong> • ${t.count} Total Students
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 shrink-0">
+            <div class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-center">
+              <div class="text-[10px] font-bold uppercase text-slate-400">Appraisal Index</div>
+              <div class="text-base font-extrabold text-teal-700">${t.appraisal}<span class="text-xs font-normal text-slate-400">/100</span></div>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-center">
+              <div class="text-[10px] font-bold uppercase text-slate-400">Subject Mean</div>
+              <div class="text-base font-extrabold text-slate-900">${t.avg.toFixed(1)}%</div>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-center">
+              <div class="text-[10px] font-bold uppercase text-slate-400">Term Value-Add</div>
+              <div class="text-base font-extrabold ${t.termGain >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${t.termGain >= 0 ? '+' : ''}${t.termGain.toFixed(1)}%</div>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-center">
+              <div class="text-[10px] font-bold uppercase text-slate-400">YoY Faculty Δ</div>
+              <div class="text-base font-extrabold ${t.yoyDelta >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${t.yoyDelta >= 0 ? '+' : ''}${t.yoyDelta.toFixed(1)}%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+          <!-- Section-by-Section Performance Cards -->
+          <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            ${t.sectionBreakdown.map(sb => `
+              <div class="bg-white rounded-xl border border-slate-200 p-3 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-extrabold text-slate-900">Class ${t.classNum}-${sb.sec}</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${sb.passPct >= 90 ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">
+                    Pass ${sb.passPct.toFixed(0)}%
+                  </span>
+                </div>
+                <div class="my-1">
+                  <div class="text-xl font-extrabold text-brand-700">${sb.avg.toFixed(1)}%</div>
+                  <div class="text-[10px] text-slate-400">Mean Score (${sb.count} students)</div>
+                </div>
+                <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
+                  <span>90+ Club: <strong>${sb.club90}</strong></span>
+                  <span class="${sb.fails > 0 ? 'text-rose-600 font-bold' : 'text-slate-400'}">Fail: ${sb.fails}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- 4-Year Historical & Term Progression Strip -->
+          <div class="lg:col-span-5 bg-white rounded-xl border border-slate-200 p-3.5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">4-Year Faculty Subject Mean Trend</span>
+                <span class="text-[11px] font-bold text-teal-700">2023–24 → 2026–27</span>
+              </div>
+              <div class="grid grid-cols-4 gap-2 text-center">
+                ${SESSIONS_LIST.map((yr, idx) => `
+                  <div class="rounded-lg p-2 ${idx === 3 ? 'bg-teal-50 border border-teal-200' : 'bg-slate-50 border border-slate-100'}">
+                    <div class="text-[10px] font-semibold text-slate-500">${yr}</div>
+                    <div class="text-xs font-extrabold ${idx === 3 ? 'text-teal-800' : 'text-slate-800'} mt-0.5">${t.yearlyAvgs[idx].toFixed(1)}%</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
+              <span>Term Progression: <strong>T1 ${t.t1Avg.toFixed(1)}%</strong> → <strong>HY ${t.hyAvg.toFixed(1)}%</strong> → <strong class="text-brand-700">PB ${t.pbAvg.toFixed(1)}%</strong></span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTeacherTableRows() {
+      document.getElementById('teacher-tbody').innerHTML = cachedTeacherMetrics.map(t => {
+        const isExpanded = expandedTeacherRows.has(t.id);
+        const tier = getAppraisalTier(t.appraisal);
+
+        const drawerHtml = isExpanded ? `
+          <tr class="bg-slate-50/90">
+            <td colspan="11" class="p-4 border-t border-b border-teal-200">
+              <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <span class="text-xs font-bold text-slate-900">Section-by-Section & 4-Year Performance Breakdown — ${t.name} (${t.subject}, Class ${t.classNum})</span>
+                    <p class="text-[11px] text-slate-500">Top Student: <strong>${t.topStudentName} (${t.highest}/100)</strong> • Term-1 Avg: ${t.t1Avg.toFixed(1)}% → Half-Yearly Avg: ${t.hyAvg.toFixed(1)}% → Pre-Board Avg: ${t.pbAvg.toFixed(1)}%</p>
+                  </div>
+                  <button onclick="inspectTeacherFromRow('${t.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-700 text-white hover:bg-teal-800 transition">
+                    Load in Top Appraisal Panel
+                  </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="overflow-x-auto rounded-lg border border-slate-200">
+                    <table class="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-500 uppercase">
+                          <th class="py-2 px-3">Section</th>
+                          <th class="py-2 px-2.5 text-center">Strength</th>
+                          <th class="py-2 px-2.5 text-right">Mean %</th>
+                          <th class="py-2 px-2.5 text-right">Pass %</th>
+                          <th class="py-2 px-2.5 text-center">90+</th>
+                          <th class="py-2 px-2.5 text-center">Fail</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100">
+                        ${t.sectionBreakdown.map(sb => `
+                          <tr>
+                            <td class="py-2 px-3 font-bold text-slate-800">Class ${t.classNum}-${sb.sec}</td>
+                            <td class="py-2 px-2.5 text-center text-slate-600">${sb.count}</td>
+                            <td class="py-2 px-2.5 text-right font-extrabold text-brand-700">${sb.avg.toFixed(1)}%</td>
+                            <td class="py-2 px-2.5 text-right font-bold text-emerald-700">${sb.passPct.toFixed(0)}%</td>
+                            <td class="py-2 px-2.5 text-center font-bold text-indigo-700">${sb.club90}</td>
+                            <td class="py-2 px-2.5 text-center font-bold ${sb.fails > 0 ? 'text-rose-600' : 'text-slate-400'}">${sb.fails}</td>
+                          </tr>
+                        `).join('')}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="overflow-x-auto rounded-lg border border-slate-200">
+                    <table class="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-500 uppercase">
+                          <th class="py-2 px-3">Session</th>
+                          <th class="py-2 px-3 text-right">Faculty Mean %</th>
+                          <th class="py-2 px-3 text-right">Pass %</th>
+                          <th class="py-2 px-3 text-right">90+ Distinctions</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100">
+                        ${SESSIONS_LIST.map((yr, idx) => `
+                          <tr class="${idx === 3 ? 'bg-teal-50/40 font-bold' : ''}">
+                            <td class="py-2 px-3 text-slate-800">${yr}</td>
+                            <td class="py-2 px-3 text-right text-teal-800">${t.yearlyAvgs[idx].toFixed(1)}%</td>
+                            <td class="py-2 px-3 text-right text-emerald-700">${t.yearlyPassPcts[idx].toFixed(0)}%</td>
+                            <td class="py-2 px-3 text-right text-indigo-700">${t.yearlyClub90[idx]}</td>
+                          </tr>
+                        `).join('')}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        ` : '';
+
+        return `
+          <tr onclick="toggleTeacherRow('${t.id}')" class="cursor-pointer hover:bg-slate-50 transition ${isExpanded ? 'bg-teal-50/30' : ''}">
+            <td class="py-3 px-3 text-center text-slate-400">
+              <i data-lucide="${isExpanded ? 'chevron-down' : 'chevron-right'}" class="w-4 h-4 inline"></i>
+            </td>
+            <td class="py-3 px-3">
+              <div class="font-bold text-xs text-slate-900">${t.name}</div>
+              <div class="text-[10px] font-mono text-slate-400">${t.id}</div>
+            </td>
+            <td class="py-3 px-3">
+              <div class="font-semibold text-xs text-brand-700">${t.subject}</div>
+              <div class="text-[10px] text-slate-500">Class ${t.classNum} (${t.sections.join(', ')})</div>
+            </td>
+            <td class="py-3 px-2.5 text-center text-xs font-semibold text-slate-700">${t.count}</td>
+            <td class="py-3 px-2.5 text-right font-bold text-xs text-slate-900">${t.avg.toFixed(1)}%</td>
+            <td class="py-3 px-2.5 text-right">${formatDeltaBadge(t.termGain, '%')}</td>
+            <td class="py-3 px-2.5 text-right font-bold text-xs ${t.passPct >= 90 ? 'text-emerald-600' : 'text-amber-600'}">${t.passPct.toFixed(1)}%</td>
+            <td class="py-3 px-2.5 text-center text-xs font-bold text-indigo-700">${t.club90}</td>
+            <td class="py-3 px-2.5 text-center text-xs font-bold ${t.fails > 0 ? 'text-rose-600' : 'text-slate-400'}">${t.fails}</td>
+            <td class="py-3 px-2.5 text-right">${formatDeltaBadge(t.yoyDelta, '%')}</td>
+            <td class="py-3 px-3 text-right">
+              <span class="px-2.5 py-1 rounded-full text-xs font-extrabold border ${tier.cls}">${t.appraisal} / 100</span>
+            </td>
+          </tr>
+          ${drawerHtml}
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
     function renderTeacherTab() {
       const classFilter = document.getElementById('filter-class').value;
       const activeTeachers = TEACHER_DIRECTORY.filter(t => classFilter === 'ALL' || t.classNum === classFilter);
 
-      const teacherMetrics = activeTeachers.map(t => {
+      // Pre-compute multi-year session cohorts for YoY teacher metrics
+      const multiYrCohorts = {};
+      SESSIONS_LIST.forEach(yr => {
+        multiYrCohorts[yr] = computeCohortForSession(yr, 'SAME_CLASS');
+      });
+
+      cachedTeacherMetrics = activeTeachers.map(t => {
         const students = processedCohort.filter(s =>
           s.classNum === t.classNum &&
           t.sections.includes(s.section) &&
@@ -2324,13 +2538,82 @@
         const passed = scores.filter(sc => sc >= 33).length;
         const passPct = count ? (passed / count) * 100 : 0;
         const highest = count ? Math.max(...scores) : 0;
+        const topStudent = students.reduce((best, cur) => (!best || cur.examMarks[t.subject] > best.examMarks[t.subject]) ? cur : best, null);
         const club90 = scores.filter(sc => sc >= 90).length;
         const fails = scores.filter(sc => sc < 33).length;
 
+        // Term-1 -> Half-Yearly -> Pre-Board subject average progression
+        const t1Avg = count ? students.reduce((sum, s) => sum + (s.marks.TERM1?.[t.subject] || 0), 0) / count : 0;
+        const hyAvg = count ? students.reduce((sum, s) => sum + (s.marks.HALFYEARLY?.[t.subject] || 0), 0) / count : 0;
+        const pbAvg = count ? students.reduce((sum, s) => sum + (s.marks.PREBOARD?.[t.subject] || 0), 0) / count : 0;
+        const termGain = pbAvg - t1Avg;
+
+        // Section-by-Section Breakdown (A, B, C)
+        const sectionBreakdown = t.sections.map(sec => {
+          const secStudents = students.filter(s => s.section === sec);
+          const sCnt = secStudents.length;
+          const sScores = secStudents.map(s => s.examMarks[t.subject]);
+          const sAvg = sCnt ? sScores.reduce((a, b) => a + b, 0) / sCnt : 0;
+          const sPass = sCnt ? (sScores.filter(sc => sc >= 33).length / sCnt) * 100 : 0;
+          const sClub90 = sScores.filter(sc => sc >= 90).length;
+          const sFails = sScores.filter(sc => sc < 33).length;
+          return { sec, count: sCnt, avg: sAvg, passPct: sPass, club90: sClub90, fails: sFails };
+        });
+
+        // 4-Year YoY Faculty Metrics
+        const yearlyAvgs = [];
+        const yearlyPassPcts = [];
+        const yearlyClub90 = [];
+        SESSIONS_LIST.forEach(yr => {
+          const yrPeers = multiYrCohorts[yr].filter(s =>
+            s.classNum === t.classNum &&
+            t.sections.includes(s.section) &&
+            s.examMarks[t.subject] !== undefined
+          );
+          const yCnt = yrPeers.length || 1;
+          const yScores = yrPeers.map(s => s.examMarks[t.subject]);
+          yearlyAvgs.push(yScores.reduce((a, b) => a + b, 0) / yCnt);
+          yearlyPassPcts.push((yScores.filter(sc => sc >= 33).length / yCnt) * 100);
+          yearlyClub90.push(yScores.filter(sc => sc >= 90).length);
+        });
+
+        const yoyDelta = yearlyAvgs[3] - yearlyAvgs[2];
+
         // Appraisal Index out of 100
-        const appraisal = Number(((passPct * 0.5) + (avg * 0.4) + (Math.min(club90, 5) * 2)).toFixed(1));
-        return { ...t, count, avg, passPct, highest, club90, fails, appraisal };
+        const appraisal = Number(Math.min(100, (passPct * 0.45) + (avg * 0.4) + (Math.min(club90, 6) * 2) + Math.max(0, termGain * 0.8)).toFixed(1));
+        return {
+          ...t,
+          count,
+          avg,
+          passPct,
+          highest,
+          topStudentName: topStudent ? topStudent.name : '—',
+          club90,
+          fails,
+          t1Avg,
+          hyAvg,
+          pbAvg,
+          termGain,
+          sectionBreakdown,
+          yearlyAvgs,
+          yearlyPassPcts,
+          yearlyClub90,
+          yoyDelta,
+          appraisal
+        };
       }).sort((a, b) => b.appraisal - a.appraisal);
+
+      // Populate Deep-Dive Selector
+      const focusSel = document.getElementById('teacher-focus-select');
+      if (focusSel) {
+        const prevVal = focusSel.value;
+        focusSel.innerHTML = cachedTeacherMetrics.map(t =>
+          `<option value="${t.id}">${t.name} — ${t.subject} (Cls ${t.classNum}) • Index ${t.appraisal}</option>`
+        ).join('');
+        if (cachedTeacherMetrics.some(t => t.id === prevVal)) focusSel.value = prevVal;
+      }
+
+      renderTeacherDeepDive();
 
       // Chart
       destroyChart('teacherChart');
@@ -2338,13 +2621,21 @@
       chartInstances['teacherChart'] = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: teacherMetrics.map(t => `${t.name.replace(/^(Dr\.|Mrs\.|Ms\.|Mr\.)\s*/, '')} (${t.subject.slice(0, 4)})`),
-          datasets: [{
-            label: 'Subject Mean %',
-            data: teacherMetrics.map(t => Number(t.avg.toFixed(1))),
-            backgroundColor: '#0d9488',
-            borderRadius: 6
-          }]
+          labels: cachedTeacherMetrics.map(t => `${t.name.replace(/^(Dr\.|Mrs\.|Ms\.|Mr\.)\s*/, '')} (${t.subject.slice(0, 4)})`),
+          datasets: [
+            {
+              label: 'Subject Mean %',
+              data: cachedTeacherMetrics.map(t => Number(t.avg.toFixed(1))),
+              backgroundColor: '#0d9488',
+              borderRadius: 5
+            },
+            {
+              label: 'Pass %',
+              data: cachedTeacherMetrics.map(t => Number(t.passPct.toFixed(1))),
+              backgroundColor: '#6366f1',
+              borderRadius: 5
+            }
+          ]
         },
         options: {
           responsive: true,
@@ -2354,20 +2645,20 @@
             x: { beginAtZero: true, max: 100, ticks: { font: { size: 10 } } },
             y: { ticks: { font: { size: 10, weight: '600' } }, grid: { display: false } }
           },
-          plugins: { legend: { display: false } }
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
         }
       });
 
       // Top 3 Faculty Highlight Cards
-      const topFac = teacherMetrics.slice(0, 3);
+      const topFac = cachedTeacherMetrics.slice(0, 3);
       document.getElementById('teacher-highlights').innerHTML = topFac.map((t, idx) => `
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between gap-3">
+        <div onclick="inspectTeacherFromRow('${t.id}')" class="cursor-pointer bg-slate-50 border border-slate-200 hover:border-teal-300 rounded-2xl p-3.5 flex items-center justify-between gap-3 transition">
           <div>
             <span class="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
               #${idx + 1} Faculty Index • ${t.subject}
             </span>
             <h4 class="text-sm font-bold text-slate-900 mt-1">${t.name}</h4>
-            <p class="text-[11px] text-slate-500">Class ${t.classNum} • Pass Rate: ${t.passPct.toFixed(0)}% • ${t.club90} Distinctions</p>
+            <p class="text-[11px] text-slate-500">Class ${t.classNum} • Pass: ${t.passPct.toFixed(0)}% • Term Gain: ${t.termGain >= 0 ? '+' : ''}${t.termGain.toFixed(1)}%</p>
           </div>
           <div class="text-right">
             <div class="text-lg font-extrabold text-teal-700">${t.appraisal}</div>
@@ -2376,26 +2667,8 @@
         </div>
       `).join('');
 
-      // Table
-      document.getElementById('teacher-tbody').innerHTML = teacherMetrics.map(t => `
-        <tr class="hover:bg-slate-50">
-          <td class="py-3 px-4">
-            <div class="font-bold text-xs text-slate-900">${t.name}</div>
-            <div class="text-[10px] font-mono text-slate-400">${t.id}</div>
-          </td>
-          <td class="py-3 px-4 font-semibold text-xs text-brand-700">${t.subject}</td>
-          <td class="py-3 px-4 text-xs text-slate-600">Class ${t.classNum} (${t.sections.join(', ')})</td>
-          <td class="py-3 px-3 text-center text-xs font-semibold text-slate-700">${t.count}</td>
-          <td class="py-3 px-3 text-right font-bold text-xs text-slate-900">${t.avg.toFixed(1)}%</td>
-          <td class="py-3 px-3 text-right font-bold text-xs ${t.passPct >= 90 ? 'text-emerald-600' : 'text-amber-600'}">${t.passPct.toFixed(1)}%</td>
-          <td class="py-3 px-3 text-center text-xs font-bold text-slate-800">${t.highest}</td>
-          <td class="py-3 px-3 text-center text-xs font-bold text-indigo-700">${t.club90}</td>
-          <td class="py-3 px-3 text-center text-xs font-bold ${t.fails > 0 ? 'text-rose-600' : 'text-slate-400'}">${t.fails}</td>
-          <td class="py-3 px-4 text-right">
-            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-teal-50 text-teal-800 border border-teal-200">${t.appraisal} / 100</span>
-          </td>
-        </tr>
-      `).join('');
+      // Table Rows
+      renderTeacherTableRows();
     }
 
     // -------------------------------------------------------------------------
